@@ -1,0 +1,42 @@
+import os
+import tempfile
+import pytest
+from utils.files_utils import load_file, save_to_file
+
+def test_load_file_list_and_set():
+    # Utworzenie tymczasowego pliku
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False) as tmp:
+        tmp.write("line1\nline2\nline3\nline1\n")
+        tmp_path = tmp.name
+
+    # Test wczytywania jako lista
+    data_list = load_file(tmp_path, as_set=False)
+    assert isinstance(data_list, list)
+    assert data_list == ["line1", "line2", "line3", "line1"]
+
+    # Test wczytywania jako set
+    data_set = load_file(tmp_path, as_set=True)
+    assert isinstance(data_set, set)
+    assert data_set == {"line1", "line2", "line3"}
+
+    os.remove(tmp_path)
+
+def test_load_file_nonexistent():
+    # Test wczytywania nieistniejącego pliku
+    data_list = load_file("nonexistent_file.txt", as_set=False)
+    assert data_list == []
+
+    data_set = load_file("nonexistent_file.txt", as_set=True)
+    assert data_set == set()
+
+def test_save_to_file_and_load():
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False) as tmp:
+        tmp_path = tmp.name
+
+    save_to_file(tmp_path, "combo1")
+    save_to_file(tmp_path, "combo2")
+
+    data = load_file(tmp_path)
+    assert data == ["combo1", "combo2"]
+
+    os.remove(tmp_path)
