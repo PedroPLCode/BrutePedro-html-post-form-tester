@@ -30,7 +30,7 @@ def run_brute_force() -> None:
         print("[!] Username or password files are empty.")
         return
 
-    combo: Optional[str] = None  # track current attempt
+    combo: Optional[str] = None
     try:
         for username in usernames:
             for password in passwords:

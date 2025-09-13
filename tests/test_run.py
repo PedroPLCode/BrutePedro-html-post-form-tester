@@ -1,9 +1,23 @@
-import pytest
 from unittest.mock import patch, Mock
 from run import run_brute_force
 from settings import USERNAMES_FILE, PASSWORDS_FILE, SUCCESS_FILE, PROGRESS_FILE
 
 def test_run_brute_force_success(tmp_path):
+    """
+    Test the run_brute_force function for successful login attempts.
+
+    This test mocks file I/O and network calls to simulate a brute-force
+    scenario. It verifies that all username:password combinations are
+    attempted and recorded in the known_success set, and that progress
+    is saved during execution.
+
+    Args:
+        tmp_path: pytest temporary path fixture for creating temporary files.
+
+    Assertions:
+        - All username:password combinations are added to known_success.
+        - The save_to_file function is called to save progress.
+    """
     known_success = set()
     usernames = ["user1", "user2"]
     passwords = ["pass1", "pass2"]
@@ -19,7 +33,6 @@ def test_run_brute_force_success(tmp_path):
             return passwords
         return []
 
-    # Mock create_session, load_file, save_to_file, try_login
     with patch("run.create_session") as mock_create_session, \
          patch("run.load_file", side_effect=load_file_side_effect), \
          patch("run.save_to_file") as mock_save, \
@@ -28,15 +41,14 @@ def test_run_brute_force_success(tmp_path):
         mock_create_session.return_value = Mock()
 
         def try_login_side_effect(session, known, username, password):
+            """Mock try_login to always succeed and add to known_success."""
             known.add(f"{username}:{password}")
             return True
 
         mock_try_login.side_effect = try_login_side_effect
 
-        # Run the brute-force
         run_brute_force()
 
-        # Assertions
         for u in usernames:
             for p in passwords:
                 assert f"{u}:{p}" in known_success
