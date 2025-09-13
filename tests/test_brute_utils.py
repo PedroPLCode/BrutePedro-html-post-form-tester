@@ -2,6 +2,7 @@ import pytest
 from unittest.mock import patch, Mock
 from utils.brute_utils import create_session, get_csrf_token, try_login
 
+
 @pytest.fixture
 def mock_session():
     """
@@ -12,6 +13,7 @@ def mock_session():
     """
     mock_sess = Mock()
     return mock_sess
+
 
 def test_create_session_success():
     """
@@ -25,6 +27,7 @@ def test_create_session_success():
         session = create_session()
         assert session is not None
 
+
 def test_create_session_failure():
     """
     Test that create_session returns None when the server responds
@@ -36,6 +39,7 @@ def test_create_session_failure():
         mock_get.return_value = mock_resp
         session = create_session()
         assert session is None
+
 
 def test_get_csrf_token_found(mock_session):
     """
@@ -52,6 +56,7 @@ def test_get_csrf_token_found(mock_session):
     token = get_csrf_token(mock_session)
     assert token == "12345"
 
+
 def test_get_csrf_token_not_found(mock_session):
     """
     Test that get_csrf_token returns None when no CSRF token
@@ -60,12 +65,13 @@ def test_get_csrf_token_not_found(mock_session):
     Args:
         mock_session (Mock): Mocked HTTP session.
     """
-    html = '<html></html>'
+    html = "<html></html>"
     mock_resp = Mock()
     mock_resp.text = html
     mock_session.get.return_value = mock_resp
     token = get_csrf_token(mock_session)
     assert token is None
+
 
 def test_try_login_success(mock_session, tmp_path):
     """
@@ -90,9 +96,11 @@ def test_try_login_success(mock_session, tmp_path):
     success_file_path = tmp_path / "success.txt"
 
     with patch("utils.brute_utils.save_to_file") as mock_save:
+
         def write_mock(filepath, combo):
             with open(success_file_path, "a") as f:
                 f.write(combo + "\n")
+
         mock_save.side_effect = write_mock
 
         result = try_login(mock_session, known_success, "user", "pass")

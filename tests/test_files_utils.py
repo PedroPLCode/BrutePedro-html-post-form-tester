@@ -2,6 +2,7 @@ import os
 import tempfile
 from utils.files_utils import load_file, save_to_file
 
+
 def test_load_file_list_and_set():
     """
     Test loading a file as a list and as a set.
@@ -24,6 +25,7 @@ def test_load_file_list_and_set():
 
     os.remove(tmp_path)
 
+
 def test_load_file_nonexistent():
     """
     Test loading a non-existent file.
@@ -37,6 +39,7 @@ def test_load_file_nonexistent():
 
     data_set = load_file("nonexistent_file.txt", as_set=True)
     assert data_set == set()
+
 
 def test_save_to_file_and_load():
     """

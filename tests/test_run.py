@@ -1,6 +1,12 @@
 from unittest.mock import patch, Mock
 from run import run_brute_force
-from settings import USERNAMES_FILE, PASSWORDS_FILE, SUCCESS_FILE, PROGRESS_FILE
+from settings import (
+    USERNAMES_FILE_PATH,
+    PASSWORDS_FILE_PATH,
+    SUCCESS_FILE_PATH,
+    PROGRESS_FILE_PATH,
+)
+
 
 def test_run_brute_force_success(tmp_path):
     """
@@ -23,20 +29,19 @@ def test_run_brute_force_success(tmp_path):
     passwords = ["pass1", "pass2"]
 
     def load_file_side_effect(filepath, as_set=False):
-        if filepath == SUCCESS_FILE:
+        if filepath == SUCCESS_FILE_PATH:
             return known_success
-        elif filepath == PROGRESS_FILE:
+        elif filepath == PROGRESS_FILE_PATH:
             return []
-        elif filepath == USERNAMES_FILE:
+        elif filepath == USERNAMES_FILE_PATH:
             return usernames
-        elif filepath == PASSWORDS_FILE:
+        elif filepath == PASSWORDS_FILE_PATH:
             return passwords
         return []
 
-    with patch("run.create_session") as mock_create_session, \
-         patch("run.load_file", side_effect=load_file_side_effect), \
-         patch("run.save_to_file") as mock_save, \
-         patch("run.try_login") as mock_try_login:
+    with patch("run.create_session") as mock_create_session, patch(
+        "run.load_file", side_effect=load_file_side_effect
+    ), patch("run.save_to_file") as mock_save, patch("run.try_login") as mock_try_login:
 
         mock_create_session.return_value = Mock()
 

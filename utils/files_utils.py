@@ -1,13 +1,14 @@
 import os
 from typing import Union, List, Set
 
+
 def load_file(filepath: str, as_set: bool = False) -> Union[List[str], Set[str]]:
     """
     Loads a file into a list or set (unique lines).
 
     Args:
         filepath (str): Path to the file to be loaded.
-        as_set (bool, optional): If True, returns a set (unique lines), 
+        as_set (bool, optional): If True, returns a set (unique lines),
                                  otherwise returns a list. Defaults to False.
 
     Returns:
@@ -24,6 +25,7 @@ def load_file(filepath: str, as_set: bool = False) -> Union[List[str], Set[str]]
     except Exception as e:
         print(f"[!] Error reading file {filepath}: {e}")
         return set() if as_set else []
+
 
 def save_to_file(filepath: str, combo: str) -> None:
     """

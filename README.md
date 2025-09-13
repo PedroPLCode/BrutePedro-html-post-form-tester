@@ -1,9 +1,10 @@
+in progress
+
 to do:
 -poprawki
 -refactor
 -black
-
-
+-write nice readme :)
 
 
 
