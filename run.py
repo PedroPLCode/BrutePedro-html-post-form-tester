@@ -1,17 +1,19 @@
+import os 
 from utils.brute_utils import create_session, check_server, try_login
-from utils.files_utils import check_and_load_known_success, check_and_load_progress, load_usernames_and_passwords, save_to_file
-from settings import PROGRESS_FILE
+from utils.files_utils import load_file, save_to_file
+from settings import PASSWORD_FILE, PROGRESS_FILE, SUCCESS_FILE, LOGIN_FILE
 
 def check_all_and_run_brute_force():
     """Główna funkcja do sprawdzenia serwera i uruchomienia ataku brute-force."""
     session = create_session()
 
-    known_success = check_and_load_known_success()
-    last_combo = check_and_load_progress()
-    
+    known_success = load_file(SUCCESS_FILE, as_set=True)
+    last_combo = load_file(PROGRESS_FILE)[-1] if os.path.exists(PROGRESS_FILE) else None
+
     resume = last_combo is None
 
-    usernames, passwords = load_usernames_and_passwords()
+    usernames = load_file(LOGIN_FILE)
+    passwords = load_file(PASSWORD_FILE)
 
     if not check_server(session):
         print("[!] Serwer jest niedostępny. Kończę.")
@@ -40,3 +42,6 @@ def check_all_and_run_brute_force():
                 continue
             
             try_login(session, known_success, username, password)
+
+if __name__ == "__main__":
+    check_all_and_run_brute_force()

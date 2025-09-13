@@ -1,40 +1,23 @@
 import os
-from settings import LOGIN_FILE, PASSWORD_FILE, SUCCESS_FILE, PROGRESS_FILE
 
-def check_and_load_known_success():
-    """Wczytanie już znalezionych sukcesów z pliku."""
-        # Wczytanie już znalezionych sukcesów
-    if os.path.exists(SUCCESS_FILE):
-        with open(SUCCESS_FILE, "r") as f:
-            known_success = set(line.strip() for line in f)
-        print(f"[*] Wczytano {len(known_success)} znanych sukcesów.")
-    else:
-        known_success = set()
-        print("[*] Brak znanych sukcesów.")
-    return known_success
+def load_file(filepath, as_set=False):
+    """Wczytanie pliku do listy lub zestawu (unikalne linie)."""
+    try:
+        if os.path.exists(filepath):
+            with open(filepath, "r") as f:
+                data = [line.strip() for line in f if line.strip()]
+            print(f"[*] Wczytano {len(data)} rekordów z {filepath}")
+            return set(data) if as_set else data
+        print(f"[*] Plik {filepath} nie istnieje, tworzymy pustą strukturę.")
+        return set() if as_set else []
+    except Exception as e:
+        print(f"[!] Błąd wczytywania pliku {filepath}: {e}")
+        return set() if as_set else []
 
-def check_and_load_progress():
-    """Wczytanie miejsca wznowienia z pliku."""
-    if os.path.exists(PROGRESS_FILE):
-        with open(PROGRESS_FILE, "r") as f:
-            last_combo = f.read().strip()
-        print(f"[*] Wznowienie od: {last_combo}")
-    else:
-        last_combo = None
-        print("[*] Brak pliku postępu, zaczynam od początku.")
-    return last_combo
-    
-def load_usernames_and_passwords():
-    """Wczytanie loginów i haseł z plików."""
-    with open(LOGIN_FILE, "r") as f:
-        logins = [line.strip() for line in f if line.strip()]
-
-    with open(PASSWORD_FILE, "r") as f:
-        passwords = [line.strip() for line in f if line.strip()]
-    
-    return logins, passwords
-
-def save_to_file(FILE, combo):
-    """Zapisanie sukcesu do pliku."""
-    with open(FILE, "a") as f:
-        f.write(combo + "\n")
+def save_to_file(filepath, combo):
+    """Zapisanie jednej linii do pliku (append)."""
+    try:
+        with open(filepath, "a") as f:
+            f.write(f"{combo}\n")
+    except Exception as e:
+        print(f"[!] Błąd zapisu do pliku {filepath}: {e}")
