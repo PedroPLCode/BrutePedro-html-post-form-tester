@@ -47,10 +47,23 @@ def test_try_login_success(mock_session, tmp_path):
 
     mock_resp_post = Mock()
     mock_resp_post.json.return_value = {"error": False}
-    with patch.object(mock_session, "post", return_value=mock_resp_post):
-        from utils.brute_utils import SUCCESS_FILE
-        success_file = tmp_path / "success.txt"
-        with patch("utils.brute_utils.SAVE_FILE", new=success_file):
-            result = try_login(mock_session, known_success, "user", "pass")
-            assert result is True
-            assert "user:pass" in known_success
+    mock_session.post.return_value = mock_resp_post
+
+    success_file_path = tmp_path / "success.txt"
+
+    # Patch save_to_file to actually write to tmp_path file
+    with patch("utils.brute_utils.save_to_file") as mock_save:
+        def write_mock(filepath, combo):
+            with open(success_file_path, "a") as f:
+                f.write(combo + "\n")
+        mock_save.side_effect = write_mock
+
+        result = try_login(mock_session, known_success, "user", "pass")
+
+    # Assertions
+    assert result is True
+    assert "user:pass" in known_success
+
+    # Check file content
+    content = success_file_path.read_text().strip()
+    assert content == "user:pass"
