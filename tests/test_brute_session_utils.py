@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, Mock
-from utils.brute_utils import create_session, get_csrf_token, try_login
+from utils.brute_session_utils import create_session, get_csrf_token, try_login
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ def test_create_session_success():
     Test that create_session returns a valid session when the server
     responds with status code 200.
     """
-    with patch("utils.brute_utils.requests.Session.get") as mock_get:
+    with patch("utils.brute_session_utils.requests.Session.get") as mock_get:
         mock_resp = Mock()
         mock_resp.status_code = 200
         mock_get.return_value = mock_resp
@@ -33,7 +33,7 @@ def test_create_session_failure():
     Test that create_session returns None when the server responds
     with a non-200 status code.
     """
-    with patch("utils.brute_utils.requests.Session.get") as mock_get:
+    with patch("utils.brute_session_utils.requests.Session.get") as mock_get:
         mock_resp = Mock()
         mock_resp.status_code = 500
         mock_get.return_value = mock_resp
@@ -90,12 +90,13 @@ def test_try_login_success(mock_session, tmp_path):
     mock_session.get.return_value.text = html_token
 
     mock_resp_post = Mock()
+    mock_resp_post.status_code = 200
     mock_resp_post.json.return_value = {"error": False}
     mock_session.post.return_value = mock_resp_post
 
     success_file_path = tmp_path / "success.txt"
 
-    with patch("utils.brute_utils.save_to_file") as mock_save:
+    with patch("utils.brute_session_utils.save_to_file") as mock_save:
 
         def write_mock(filepath, combo):
             with open(success_file_path, "a") as f:

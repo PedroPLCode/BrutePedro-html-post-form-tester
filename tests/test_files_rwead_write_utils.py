@@ -1,6 +1,6 @@
 import os
 import tempfile
-from utils.files_utils import load_file, save_to_file
+from utils.files_read_write_utils import load_file, save_to_file
 
 
 def test_save_to_file_append(tmp_path):

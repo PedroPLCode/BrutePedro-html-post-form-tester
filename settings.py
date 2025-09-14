@@ -12,11 +12,23 @@ Attributes:
                         combinations are stored.
     PROGRESS_FILE (str): Path to the file tracking the last attempted combination
                          to allow resuming the brute-force attack.
+    LOGIN_PARAM_STRING (str): The form parameter name for the username field in the login form.
+    PASSWORD_PARAM_STRING (str): The form parameter name for the password field in the login form.
+    CSRF_PARAM_STRING (str): The form parameter name for the CSRF token field in the login form.
+    DELAY_BETWEEN_REQUESTS (float): Delay in seconds between login attempts to avoid rate limiting.
 """
 
 LOGIN_PAGE = "https://login_page_url_here"
 LOGIN_POST = "https://login_post_url_here"
+
 USERNAMES_FILE_PATH = "data/usernames.txt"
 PASSWORDS_FILE_PATH = "data/passwords.txt"
+
 SUCCESS_FILE_PATH = "data/success.brute"
 PROGRESS_FILE_PATH = "data/progress.brute"
+
+LOGIN_PARAM_STRING = "login"
+PASSWORD_PARAM_STRING = "password"
+CSRF_PARAM_STRING = "csrf_token"
+
+DELAY_BETWEEN_REQUESTS = 1.5
