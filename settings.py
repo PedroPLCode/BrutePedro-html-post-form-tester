@@ -7,6 +7,8 @@ Attributes:
     LOGIN_PAGE_URL (str): URL of the login page where CSRF token is fetched.
     LOGIN_POST_URL (str): URL of the POST endpoint to submit login requests.
     DEFAULT_SESSION_HEADERS (dict): Default headers for the HTTP session.
+    DELAY_BETWEEN_REQUESTS (float): Delay in seconds between login attempts to avoid rate limiting.
+    MAX_ATTEMPTS_PER_SESSION (int): Number of login attempts before refreshing the session.
     DATA_DIR (str): Directory where data files are stored.
     USERNAMES_FILE (str): Path to the file containing username list.
     PASSWORDS_FILE (str): Path to the file containing password list.
@@ -17,7 +19,6 @@ Attributes:
     USERNAME_PARAM_STRING (str): The form parameter name for the username field in the login form.
     PASSWORD_PARAM_STRING (str): The form parameter name for the password field in the login form.
     CSRF_PARAM_STRING (str): The form parameter name for the CSRF token field in the login form.
-    DELAY_BETWEEN_REQUESTS (float): Delay in seconds between login attempts to avoid rate limiting.
 """
 
 LOGIN_PAGE_URL = "https://example.com/apps/tncms/login.cms"
@@ -35,6 +36,8 @@ DEFAULT_SESSION_HEADERS = {
     "Priority": "u=0",
     "Te": "trailers",
 }
+DELAY_BETWEEN_REQUESTS = 1.5
+MAX_ATTEMPTS_PER_SESSION = 25
 
 DATA_DIR = "data"
 USERNAMES_FILE_PATH = f"{DATA_DIR}/usernames.txt"
@@ -45,5 +48,3 @@ PROGRESS_FILE_PATH = f"{DATA_DIR}/progress.brute"
 USERNAME_PARAM_STRING = "username"
 PASSWORD_PARAM_STRING = "password"
 CSRF_PARAM_STRING = "csrf_token"
-
-DELAY_BETWEEN_REQUESTS = 1.5
