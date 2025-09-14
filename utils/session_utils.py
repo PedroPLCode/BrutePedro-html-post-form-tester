@@ -32,7 +32,9 @@ def create_session() -> Optional[requests.Session]:
     return session
 
 
-def refresh_session(session: requests.Session, counter: int) -> Tuple[Optional[requests.Session], int]:
+def refresh_session(
+    session: requests.Session, counter: int
+) -> Tuple[Optional[requests.Session], int]:
     """
     Refresh the session if the attempt counter exceeds the maximum allowed attempts.
 
@@ -44,7 +46,7 @@ def refresh_session(session: requests.Session, counter: int) -> Tuple[Optional[r
         counter (int): The current number of login attempts with this session.
 
     Returns:
-        Tuple[Optional[requests.Session], int]: 
+        Tuple[Optional[requests.Session], int]:
             A tuple containing:
                 - The refreshed session (or None if session creation failed).
                 - The updated attempt counter (0 if refreshed, unchanged otherwise).
@@ -53,7 +55,7 @@ def refresh_session(session: requests.Session, counter: int) -> Tuple[Optional[r
         print("[*] Refreshing session...")
         new_sess = create_session()
         return (new_sess, 0) if new_sess else (None, 0)
-    
+
     return session, counter
 
 
@@ -70,8 +72,20 @@ def fetch_login_form(session: requests.Session) -> Tuple[str, Dict[str, str]]:
     resp = session.get(LOGIN_PAGE_URL, timeout=10)
     soup = BeautifulSoup(resp.text, "html.parser")
     form = soup.find("form")
-    post_url = urljoin(LOGIN_PAGE_URL, form.get("action")) if form and form.get("action") else LOGIN_POST_URL
-    form_values = {inp.get("name"): inp.get("value", "") for inp in form.find_all("input") if inp.get("name")} if form else {}
+    post_url = (
+        urljoin(LOGIN_PAGE_URL, form.get("action"))
+        if form and form.get("action")
+        else LOGIN_POST_URL
+    )
+    form_values = (
+        {
+            inp.get("name"): inp.get("value", "")
+            for inp in form.find_all("input")
+            if inp.get("name")
+        }
+        if form
+        else {}
+    )
     return post_url, form_values
 
 

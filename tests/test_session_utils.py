@@ -17,6 +17,7 @@ def mock_session():
     Returns:
         DummySession: A mocked session object with `get` and `post` methods.
     """
+
     class DummySession:
         headers = {}
         cookies = {}
@@ -24,7 +25,7 @@ def mock_session():
         def get(self, url, timeout=None):
             resp = Mock()
             resp.status_code = 200
-            resp.cookies = {'dummy': 'cookie'}
+            resp.cookies = {"dummy": "cookie"}
             resp.text = '<form action="/login.cms"><input name="csrf_token" value="abc123"/></form>'
             return resp
 
@@ -32,7 +33,10 @@ def mock_session():
             resp = Mock()
             resp.status_code = 200
 
-            if data[USERNAME_PARAM_STRING] == "admin" and data[PASSWORD_PARAM_STRING] == "123":
+            if (
+                data[USERNAME_PARAM_STRING] == "admin"
+                and data[PASSWORD_PARAM_STRING] == "123"
+            ):
                 resp.json.return_value = {"error": False}
             else:
                 resp.json.return_value = {"error": True}

