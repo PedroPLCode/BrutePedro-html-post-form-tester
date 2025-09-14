@@ -1,6 +1,7 @@
 from typing import Optional
-from utils.brute_session_utils import create_session, try_login
-from utils.files_read_write_utils import load_file, save_to_file
+from utils.brute_utils import try_login
+from utils.session_utils import create_session
+from utils.files_utils import load_file, save_to_file
 from settings import (
     USERNAMES_FILE_PATH,
     PASSWORDS_FILE_PATH,
