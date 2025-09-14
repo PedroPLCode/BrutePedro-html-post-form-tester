@@ -59,7 +59,9 @@ def run_brute_force() -> None:
                         resume = True
                     continue
 
-                success, attempt_counter = try_login(session, known_success, username, password, attempt_counter)
+                success, attempt_counter = try_login(
+                    session, known_success, username, password, attempt_counter
+                )
                 save_to_file(PROGRESS_FILE_PATH, combo, overwrite=True)
                 print(f"[*] Tried: {combo} {'- Success!' if success else ''}")
                 previous_tested_combo = combo
@@ -76,11 +78,12 @@ def run_brute_force() -> None:
             print(f"[*] Progress saved in {PROGRESS_FILE_PATH}.")
             print(f"[*] Total successful combinations: {len(known_success)}")
         raise SystemExit(1)
-    
+
     print("[*] Brute-force attack completed.")
     print(f"[*] Total successful combinations: {len(known_success)}")
     if known_success:
         print(f"[*] Successful combinations saved in {SUCCESS_FILE_PATH}.")
+
 
 if __name__ == "__main__":
     run_brute_force()

@@ -4,7 +4,6 @@ from typing import Set, Tuple
 from utils.files_utils import save_to_file
 from utils.session_utils import refresh_session, fetch_login_form, extract_csrf
 from settings import (
-    LOGIN_PAGE_URL,
     SUCCESS_FILE_PATH,
     USERNAME_PARAM_STRING,
     PASSWORD_PARAM_STRING,
@@ -69,7 +68,6 @@ def try_login(
             if combo not in known_success:
                 save_to_file(SUCCESS_FILE_PATH, combo)
                 known_success.add(combo)
-            print(f"[+] Success: {combo}")
             return True, attempt_counter + 1
 
     except requests.RequestException as e:
