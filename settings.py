@@ -21,9 +21,9 @@ Attributes:
     CSRF_PARAM_STRING (str): The form parameter name for the CSRF token field in the login form.
 """
 
-LOGIN_PAGE_URL = "https://example.com/apps/tncms/login.cms"
-LOGIN_POST_URL = "https://example.com/login.cms"
-HEADERS = {
+LOGIN_PAGE_URL: str = "https://example.com/apps/tncms/login.cms"
+LOGIN_POST_URL: str = "https://example.com/login.cms"
+HEADERS: dict = {
     "Referer": LOGIN_PAGE_URL,
     "Origin": f"https://{LOGIN_PAGE_URL.split('://')[1].split('/')[0]}",
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
@@ -38,15 +38,15 @@ HEADERS = {
     "Priority": "u=0",
     "Te": "trailers",
 }
-DELAY_BETWEEN_REQUESTS = 1.5
-MAX_ATTEMPTS_PER_SESSION = 25
+DELAY_BETWEEN_REQUESTS: float = 1.5
+MAX_ATTEMPTS_PER_SESSION: int = 25
 
-DATA_DIR = "data"
-USERNAMES_FILE_PATH = f"{DATA_DIR}/usernames.txt"
-PASSWORDS_FILE_PATH = f"{DATA_DIR}/passwords.txt"
-SUCCESS_FILE_PATH = f"{DATA_DIR}/success.brute"
-PROGRESS_FILE_PATH = f"{DATA_DIR}/progress.brute"
+DATA_DIR: str = "data"
+USERNAMES_FILE_PATH: str = f"{DATA_DIR}/usernames.txt"
+PASSWORDS_FILE_PATH: str = f"{DATA_DIR}/passwords.txt"
+SUCCESS_FILE_PATH: str = f"{DATA_DIR}/success.brute"
+PROGRESS_FILE_PATH: str = f"{DATA_DIR}/progress.brute"
 
-USERNAME_PARAM_STRING = "username"
-PASSWORD_PARAM_STRING = "password"
-CSRF_PARAM_STRING = "csrf_token"
+USERNAME_PARAM_STRING: str = "username"
+PASSWORD_PARAM_STRING: str = "password"
+CSRF_PARAM_STRING: str = "csrf_token"
