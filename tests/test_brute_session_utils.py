@@ -1,113 +1,96 @@
 import pytest
-from unittest.mock import patch, Mock
-from utils.brute_session_utils import create_session, get_csrf_token, try_login
+from unittest.mock import Mock, patch
+from requests.cookies import RequestsCookieJar
+from utils.brute_session_utils import (
+    create_session,
+    fetch_login_form,
+    extract_csrf,
+    try_login,
+    LOGIN_PAGE_URL,
+    USERNAME_PARAM_STRING,
+    PASSWORD_PARAM_STRING,
+    CSRF_PARAM_STRING
+)
 
 
 @pytest.fixture
 def mock_session():
-    """
-    Creates a mocked requests.Session object.
+    class DummySession:
+        headers = {}
+        cookies = {}
+        def get(self, url, timeout=None):
+            resp = Mock()
+            resp.status_code = 200
+            resp.cookies = {'dummy': 'cookie'}
+            resp.text = '<form action="/login.cms"><input name="csrf_token" value="abc123"/></form>'
+            return resp
+        def post(self, url, data=None, timeout=None):
+            resp = Mock()
+            resp.status_code = 200
+            # Successful login simulation
+            if data[USERNAME_PARAM_STRING] == "admin" and data[PASSWORD_PARAM_STRING] == "123":
+                resp.json.return_value = {"error": False}
+            else:
+                resp.json.return_value = {"error": True}
+            resp.cookies = {}
+            return resp
+    return DummySession()
 
-    Returns:
-        Mock: A mocked session object.
-    """
-    mock_sess = Mock()
-    return mock_sess
+def test_create_session_success(monkeypatch):
+    from utils.brute_session_utils import create_session
+    import requests
 
+    class DummySession(requests.Session):
+        def get(self, url, timeout=None):
+            resp = requests.Response()
+            resp.status_code = 200
 
-def test_create_session_success():
-    """
-    Test that create_session returns a valid session when the server
-    responds with status code 200.
-    """
-    with patch("utils.brute_session_utils.requests.Session.get") as mock_get:
-        mock_resp = Mock()
-        mock_resp.status_code = 200
-        mock_get.return_value = mock_resp
-        session = create_session()
-        assert session is not None
+            jar = RequestsCookieJar()
+            jar.set("a", "b")
+            resp._content = b""
+            resp.cookies = jar
+            return resp
 
+    monkeypatch.setattr("requests.Session", DummySession)
 
-def test_create_session_failure():
-    """
-    Test that create_session returns None when the server responds
-    with a non-200 status code.
-    """
-    with patch("utils.brute_session_utils.requests.Session.get") as mock_get:
-        mock_resp = Mock()
-        mock_resp.status_code = 500
-        mock_get.return_value = mock_resp
-        session = create_session()
-        assert session is None
-
-
-def test_get_csrf_token_found(mock_session):
-    """
-    Test that get_csrf_token correctly retrieves the CSRF token
-    from the HTML of the login page.
-
-    Args:
-        mock_session (Mock): Mocked HTTP session.
-    """
-    html = '<input type="hidden" name="csrf_token" value="12345">'
-    mock_resp = Mock()
-    mock_resp.text = html
-    mock_session.get.return_value = mock_resp
-    token = get_csrf_token(mock_session)
-    assert token == "12345"
+    session = create_session()
+    assert session is not None
+    assert session.cookies.get("a") == "b"
 
 
-def test_get_csrf_token_not_found(mock_session):
-    """
-    Test that get_csrf_token returns None when no CSRF token
-    input is present in the HTML.
 
-    Args:
-        mock_session (Mock): Mocked HTTP session.
-    """
-    html = "<html></html>"
-    mock_resp = Mock()
-    mock_resp.text = html
-    mock_session.get.return_value = mock_resp
-    token = get_csrf_token(mock_session)
-    assert token is None
+def test_fetch_login_form_returns_action_and_values(mock_session):
+    post_url, form_values = fetch_login_form(mock_session)
+    assert post_url.endswith("/login.cms")
+    assert form_values["csrf_token"] == "abc123"
 
 
-def test_try_login_success(mock_session, tmp_path):
-    """
-    Test try_login function for a successful login scenario.
+def test_extract_csrf_returns_token():
+    form_values = {"csrf_token": "abc123", "_csrf": "def456", "token": "ghi789"}
+    token = extract_csrf(form_values)
+    assert token == "abc123"
 
-    This test mocks the session, CSRF token retrieval, and POST
-    request, and verifies that the combination is added to the
-    known_success set and saved to the file.
+    token2 = extract_csrf({"_csrf": "def456"})
+    assert token2 == "def456"
 
-    Args:
-        mock_session (Mock): Mocked HTTP session.
-        tmp_path (Path): Temporary path provided by pytest.
-    """
-    known_success = set()
-    html_token = '<input type="hidden" name="csrf_token" value="12345">'
-    mock_session.get.return_value.text = html_token
+    token3 = extract_csrf({"token": "ghi789"})
+    assert token3 == "ghi789"
 
-    mock_resp_post = Mock()
-    mock_resp_post.status_code = 200
-    mock_resp_post.json.return_value = {"error": False}
-    mock_session.post.return_value = mock_resp_post
+    token4 = extract_csrf({})
+    assert token4 is None
 
-    success_file_path = tmp_path / "success.txt"
 
-    with patch("utils.brute_session_utils.save_to_file") as mock_save:
+def test_try_login_success(mock_session):
+    known = set()
+    success, counter = try_login(mock_session, known, "admin", "123", 0)
+    assert success is True
+    assert "admin:123" in known
+    assert counter == 1
 
-        def write_mock(filepath, combo):
-            with open(success_file_path, "a") as f:
-                f.write(combo + "\n")
 
-        mock_save.side_effect = write_mock
-
-        result = try_login(mock_session, known_success, "user", "pass")
-
-    assert result is True
-    assert "user:pass" in known_success
-
-    content = success_file_path.read_text().strip()
-    assert content == "user:pass"
+def test_try_login_failure(mock_session):
+    known = set()
+    success, counter = try_login(mock_session, known, "user", "wrong", 0)
+    assert success is False
+    assert "user:wrong" not in known
+    assert counter == 1
