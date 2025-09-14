@@ -6,7 +6,7 @@ from settings import (
     LOGIN_PAGE_URL,
     LOGIN_POST_URL,
     MAX_ATTEMPTS_PER_SESSION,
-    DEFAULT_SESSION_HEADERS,
+    HEADERS,
     CSRF_PARAM_STRING,
 )
 
@@ -19,13 +19,14 @@ def create_session() -> Optional[requests.Session]:
         Optional[requests.Session]: Configured session if reachable, else None.
     """
     session = requests.Session()
-    session.headers.update(DEFAULT_SESSION_HEADERS)
+    session.headers.update(HEADERS)
     try:
         resp = session.get(LOGIN_PAGE_URL, timeout=10)
         if resp.status_code != 200:
             print(f"[!] Server returned status: {resp.status_code}")
             return None
         session.cookies.update(resp.cookies)
+        print("[*] Session created and initial cookies fetched.")
     except requests.RequestException as e:
         print(f"[!] Connection error: {e}")
         return None

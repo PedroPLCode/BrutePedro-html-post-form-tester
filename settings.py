@@ -6,7 +6,7 @@ This module defines the constants used by the brute-force login script.
 Attributes:
     LOGIN_PAGE_URL (str): URL of the login page where CSRF token is fetched.
     LOGIN_POST_URL (str): URL of the POST endpoint to submit login requests.
-    DEFAULT_SESSION_HEADERS (dict): Default headers for the HTTP session.
+    HEADERS (dict): Default headers for the HTTP session.
     DELAY_BETWEEN_REQUESTS (float): Delay in seconds between login attempts to avoid rate limiting.
     MAX_ATTEMPTS_PER_SESSION (int): Number of login attempts before refreshing the session.
     DATA_DIR (str): Directory where data files are stored.
@@ -23,11 +23,13 @@ Attributes:
 
 LOGIN_PAGE_URL = "https://example.com/apps/tncms/login.cms"
 LOGIN_POST_URL = "https://example.com/login.cms"
-DEFAULT_SESSION_HEADERS = {
+HEADERS = {
+    "Referer": LOGIN_PAGE_URL,
+    "Origin": f"https://{LOGIN_PAGE_URL.split('://')[1].split('/')[0]}",
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
     "Accept": "application/json, text/javascript, */*; q=0.01",
     "Accept-Language": "pl,en-US;q=0.7,en;q=0.3",
-    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Encoding": "gzip, deflate",
     "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
     "X-Requested-With": "XMLHttpRequest",
     "Sec-Fetch-Dest": "empty",

@@ -45,10 +45,10 @@ def test_run_brute_force_success(tmp_path):
 
         mock_create_session.return_value = Mock()
 
-        def try_login_side_effect(session, known, username, password):
+        def try_login_side_effect(session, known, username, password, attempt_counter):
             """Mock try_login to always succeed and add to known_success."""
             known.add(f"{username}:{password}")
-            return True
+            return True, attempt_counter + 1
 
         mock_try_login.side_effect = try_login_side_effect
 

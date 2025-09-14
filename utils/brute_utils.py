@@ -19,7 +19,7 @@ def try_login(
     known_success: Set[str],
     username: str,
     password: str,
-    attempt_counter: int,
+    attempt_counter: int = 0,
 ) -> Tuple[bool, int]:
     """
     Attempt login and refresh session periodically.
@@ -41,13 +41,6 @@ def try_login(
     csrf_val = extract_csrf(form_values)
     if csrf_val:
         payload[CSRF_PARAM_STRING] = csrf_val
-
-    session.headers.update(
-        {
-            "Referer": LOGIN_PAGE_URL,
-            "Origin": f"https://{LOGIN_PAGE_URL.split('://')[1].split('/')[0]}",
-        }
-    )
 
     try:
         resp = session.post(post_url, data=payload, timeout=15)
