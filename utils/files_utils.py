@@ -27,16 +27,22 @@ def load_file(filepath: str, as_set: bool = False) -> Union[List[str], Set[str]]
         return set() if as_set else []
 
 
-def save_to_file(filepath: str, combo: str) -> None:
+def save_to_file(filepath: str, combo: str, overwrite: bool = False) -> None:
     """
-    Appends a single line to a file.
+    Save a single line to a file.
+
+    By default appends the line to the file. If `overwrite=True`, the file
+    will be replaced with the new content.
 
     Args:
-        filepath (str): Path to the file where the line will be appended.
+        filepath (str): Path to the file where the line will be written.
         combo (str): The line/combination to be written to the file.
+        overwrite (bool, optional): If True, overwrite the file instead of appending.
+                                    Defaults to False.
     """
+    mode = "w" if overwrite else "a"
     try:
-        with open(filepath, "a") as f:
+        with open(filepath, mode, encoding="utf-8") as f:
             f.write(f"{combo}\n")
     except Exception as e:
         print(f"[!] Error writing to file {filepath}: {e}")

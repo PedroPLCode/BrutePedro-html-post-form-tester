@@ -57,8 +57,8 @@ def run_brute_force() -> None:
                     continue
 
                 print(f"[*] Attempting: {combo}")
-                save_to_file(PROGRESS_FILE_PATH, combo)
                 try_login(session, known_success, username, password)
+                save_to_file(PROGRESS_FILE_PATH, combo, overwrite=True)
 
     except (KeyboardInterrupt, Exception) as e:
         if isinstance(e, KeyboardInterrupt):
@@ -68,8 +68,8 @@ def run_brute_force() -> None:
                 f"\n[!] An unexpected error occurred: {e}. Saving progress and exiting."
             )
         if combo:
-            save_to_file(PROGRESS_FILE_PATH, combo)
-        exit(1)
+            save_to_file(PROGRESS_FILE_PATH, combo, overwrite=True)
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
