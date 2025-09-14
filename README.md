@@ -34,6 +34,7 @@ Edit settings.py to point to the target and data directory
 ```bash
 LOGIN_PAGE = "https://example.com/apps/login"
 LOGIN_POST = "https://example.com/login"
+DEFAULT_SESSION_HEADERS = "default_session_headers"
 
 DATA_DIR = "data"
 USERNAMES_FILE_PATH = f"{DATA_DIR}/usernames.txt"
@@ -41,7 +42,7 @@ PASSWORDS_FILE_PATH = f"{DATA_DIR}/passwords.txt"
 SUCCESS_FILE_PATH = f"{DATA_DIR}/success.brute"
 PROGRESS_FILE_PATH = f"{DATA_DIR}/progress.brute"
 
-LOGIN_PARAM_STRING = "login"
+USERNAME_PARAM_STRING = "username"
 PASSWORD_PARAM_STRING = "password"
 CSRF_PARAM_STRING = "csrf_token"
 

