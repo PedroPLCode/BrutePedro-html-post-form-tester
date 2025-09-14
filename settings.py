@@ -24,7 +24,7 @@ LOGIN_POST = "https://login_post_url_here"
 
 DATA_DIR = "data"
 USERNAMES_FILE_PATH = f"{DATA_DIR}/usernames.txt"
-PASSWORDS_FILE_PATH = f"{DATA_DIR}/passwords.txt"
+PASSWORDS_FILE_PATH = f"{DATA_DIR}/passwords_pl.txt"
 SUCCESS_FILE_PATH = f"{DATA_DIR}/success.brute"
 PROGRESS_FILE_PATH = f"{DATA_DIR}/progress.brute"
 
