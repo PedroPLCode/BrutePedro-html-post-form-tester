@@ -32,11 +32,13 @@ pip install -r requirements.txt
 ### Preparaion
 Edit settings.py to point to the target and data directory
 ```bash
-LOGIN_PAGE = "https://example.com/apps/login"
-LOGIN_POST = "https://example.com/login"
-DEFAULT_SESSION_HEADERS = "default_session_headers"
-DELAY_BETWEEN_REQUESTS = 1.5
-MAX_ATTEMPTS_PER_SESSION = 4
+LOGIN_PAGE_URL = "https://example.com/apps/login"
+LOGIN_POST_URL = "https://example.com/login"
+HEADERS = {
+    "default_session_headers"
+}
+DELAY_BETWEEN_REQUESTS = in seconds
+MAX_ATTEMPTS_PER_SESSION = int
 
 DATA_DIR = "data"
 USERNAMES_FILE_PATH = f"{DATA_DIR}/usernames.txt"
