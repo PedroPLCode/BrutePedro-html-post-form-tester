@@ -43,7 +43,7 @@ MAX_ATTEMPTS_PER_SESSION = 25
 
 DATA_DIR = "data"
 USERNAMES_FILE_PATH = f"{DATA_DIR}/usernames.txt"
-PASSWORDS_FILE_PATH = f"{DATA_DIR}/passwords_pl.txt"
+PASSWORDS_FILE_PATH = f"{DATA_DIR}/passwords.txt"
 SUCCESS_FILE_PATH = f"{DATA_DIR}/success.brute"
 PROGRESS_FILE_PATH = f"{DATA_DIR}/progress.brute"
 
