@@ -4,14 +4,14 @@ from typing import Optional, Set
 from bs4 import BeautifulSoup
 from utils.files_read_write_utils import save_to_file
 from settings import (
-                      LOGIN_PAGE,
-                      LOGIN_POST,
-                      SUCCESS_FILE_PATH,
-                      PASSWORD_PARAM_STRING,
-                      LOGIN_PARAM_STRING,
-                      CSRF_PARAM_STRING,
-                      DELAY_BETWEEN_REQUESTS
-                  )
+    LOGIN_PAGE,
+    LOGIN_POST,
+    SUCCESS_FILE_PATH,
+    PASSWORD_PARAM_STRING,
+    LOGIN_PARAM_STRING,
+    CSRF_PARAM_STRING,
+    DELAY_BETWEEN_REQUESTS,
+)
 
 
 def create_session() -> Optional[requests.Session]:
