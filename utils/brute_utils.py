@@ -21,10 +21,31 @@ def try_login(
     attempt_counter: int = 0,
 ) -> Tuple[bool, int]:
     """
-    Attempt login and refresh session periodically.
+    Attempts to log in to a web service using the provided credentials, 
+    handling session refreshes and tracking successful logins.
+
+    This function will:
+        - Refresh the session if needed.
+        - Fetch the login form and prepare the POST payload.
+        - Include CSRF token if present.
+        - Attempt login and handle HTTP status codes.
+        - Save successful login combinations to a file.
+
+    Args:
+        session (requests.Session): Active HTTP session used for requests.
+        known_success (Set[str]): Set of already successful "username:password" combos.
+        username (str): Username to attempt login with.
+        password (str): Password to attempt login with.
+        attempt_counter (int, optional): Counter for login attempts in the current session. Defaults to 0.
 
     Returns:
-        Tuple[bool, int]: (login_successful, updated_attempt_counter)
+        Tuple[bool, int]: 
+            - login_successful (bool): True if login succeeded, False otherwise.
+            - updated_attempt_counter (int): Incremented attempt counter after this try.
+
+    Raises:
+        requests.RequestException: If the HTTP request fails.
+        Exception: For any unexpected errors during the login process.
     """
     session, attempt_counter = refresh_session(session, attempt_counter)
     if session is None:
