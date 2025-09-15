@@ -2,6 +2,7 @@ import time
 import requests
 from typing import Set, Tuple
 from utils.files_utils import save_to_file
+from utils.timestamp_utils import timestamp
 from utils.session_utils import refresh_session, fetch_login_form, extract_csrf
 from settings import (
     SUCCESS_FILE_PATH,
@@ -21,7 +22,7 @@ def try_login(
     attempt_counter: int = 0,
 ) -> Tuple[bool, int]:
     """
-    Attempts to log in to a web service using the provided credentials, 
+    Attempts to log in to a web service using the provided credentials,
     handling session refreshes and tracking successful logins.
 
     This function will:
@@ -39,7 +40,7 @@ def try_login(
         attempt_counter (int, optional): Counter for login attempts in the current session. Defaults to 0.
 
     Returns:
-        Tuple[bool, int]: 
+        Tuple[bool, int]:
             - login_successful (bool): True if login succeeded, False otherwise.
             - updated_attempt_counter (int): Incremented attempt counter after this try.
 
@@ -47,6 +48,8 @@ def try_login(
         requests.RequestException: If the HTTP request fails.
         Exception: For any unexpected errors during the login process.
     """
+    combo = f"{username}:{password}"
+
     session, attempt_counter = refresh_session(session, attempt_counter)
     if session is None:
         return False, attempt_counter
@@ -68,32 +71,31 @@ def try_login(
         time.sleep(DELAY_BETWEEN_REQUESTS)
 
         if resp.status_code in (401, 403):
-            print("[*] Session expired, refreshing...")
+            print(f"{timestamp()} [*] Session expired, refreshing...")
             session, attempt_counter = refresh_session(
                 session, MAX_ATTEMPTS_PER_SESSION
             )
             return False, attempt_counter
 
         if resp.status_code != 200:
-            print(f"[!] Unexpected status {resp.status_code} for {username}:{password}")
+            print(f"{timestamp()} [!] Unexpected status {resp.status_code} for {combo}")
             return False, attempt_counter + 1
 
         try:
             response_json = resp.json()
         except ValueError:
-            print(f"[!] Non-JSON response for {username}:{password}")
+            print(f"{timestamp()} [!] Non-JSON response for {combo}")
             return False, attempt_counter + 1
 
         if not response_json.get("error"):
-            combo = f"{username}:{password}"
             if combo not in known_success:
                 save_to_file(SUCCESS_FILE_PATH, combo)
                 known_success.add(combo)
             return True, attempt_counter + 1
 
     except requests.RequestException as e:
-        print(f"[!] Request error for {username}:{password} -> {e}")
+        print(f"{timestamp()} [!] Request error for {combo} -> {e}")
     except Exception as e:
-        print(f"[!] Unexpected error for {username}:{password} -> {e}")
+        print(f"{timestamp()} [!] Unexpected error for {combo} -> {e}")
 
     return False, attempt_counter + 1

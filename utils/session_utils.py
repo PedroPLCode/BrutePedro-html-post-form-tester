@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from typing import Optional, Tuple, Dict
+from utils.timestamp_utils import timestamp
 from settings import (
     LOGIN_PAGE_URL,
     LOGIN_POST_URL,
@@ -23,12 +24,12 @@ def create_session() -> Optional[requests.Session]:
     try:
         resp = session.get(LOGIN_PAGE_URL, timeout=10)
         if resp.status_code != 200:
-            print(f"[!] Server returned status: {resp.status_code}")
+            print(f"{timestamp()} [!] Server returned status: {resp.status_code}")
             return None
         session.cookies.update(resp.cookies)
-        print("[*] Session created and initial cookies fetched.")
+        print(f"{timestamp()} [*] Session created and initial cookies fetched.")
     except requests.RequestException as e:
-        print(f"[!] Connection error: {e}")
+        print(f"{timestamp()} [!] Connection error: {e}")
         return None
     return session
 
@@ -53,7 +54,7 @@ def refresh_session(
                 - The updated attempt counter (0 if refreshed, unchanged otherwise).
     """
     if counter >= MAX_ATTEMPTS_PER_SESSION:
-        print("[*] Refreshing session...")
+        print(f"\n{timestamp()} [*] Refreshing session...")
         new_sess = create_session()
         return (new_sess, 0) if new_sess else (None, 0)
 

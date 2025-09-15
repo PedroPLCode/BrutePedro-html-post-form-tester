@@ -2,12 +2,15 @@ from typing import Optional
 from utils.brute_utils import try_login
 from utils.session_utils import create_session
 from utils.files_utils import load_file, save_to_file
+from utils.timestamp_utils import timestamp
 from settings import (
     USERNAMES_FILE_PATH,
     PASSWORDS_FILE_PATH,
     SUCCESS_FILE_PATH,
     PROGRESS_FILE_PATH,
 )
+
+_prev_len = 0
 
 
 def run_brute_force() -> None:
@@ -27,9 +30,11 @@ def run_brute_force() -> None:
     Raises:
         SystemExit: Exits with status 1 if interrupted or an error occurs.
     """
+    global _prev_len
+
     session = create_session()
     if not session:
-        print("[!] Failed to create session.")
+        print(f"{timestamp()} [!] Failed to create session.")
         return
 
     known_success = load_file(SUCCESS_FILE_PATH, as_set=True)
@@ -40,7 +45,7 @@ def run_brute_force() -> None:
     usernames = load_file(USERNAMES_FILE_PATH)
     passwords = load_file(PASSWORDS_FILE_PATH)
     if not usernames or not passwords:
-        print("[!] Username or password files are empty.")
+        print(f"{timestamp()} [!] Username or password files are empty.")
         return
 
     combo: Optional[str] = None
@@ -63,26 +68,42 @@ def run_brute_force() -> None:
                     session, known_success, username, password, attempt_counter
                 )
                 save_to_file(PROGRESS_FILE_PATH, combo, overwrite=True)
-                print(f"[*] Tried: {combo} {'- Success!' if success else ''}")
                 previous_tested_combo = combo
+
+                padding = " " * max(0, _prev_len - len(combo))
+                _prev_len = len(combo)
+                if success:
+                    print(f"\n{timestamp()} [+] Successful combination found: {combo}")
+                else:
+                    print(
+                        f"\r{timestamp()} [-] Failed attempt: {combo}{padding}",
+                        end="",
+                        flush=True,
+                    )
 
     except (KeyboardInterrupt, Exception) as e:
         if isinstance(e, KeyboardInterrupt):
-            print("\n[!] Interrupted by user. Saving progress and exiting.")
+            print(
+                f"\n{timestamp()} [!] Interrupted by user. Saving progress and exiting."
+            )
         else:
             print(
-                f"\n[!] An unexpected error occurred: {e}. Saving progress and exiting."
+                f"\n{timestamp()} [!] An unexpected error occurred: {e}. Saving progress and exiting."
             )
         if combo:
             save_to_file(PROGRESS_FILE_PATH, previous_tested_combo, overwrite=True)
-            print(f"[*] Progress saved in {PROGRESS_FILE_PATH}.")
-            print(f"[*] Total successful combinations: {len(known_success)}")
+            print(f"{timestamp()} [*] Progress saved in {PROGRESS_FILE_PATH}.")
+            print(
+                f"{timestamp()} [*] Total successful combinations: {len(known_success)}"
+            )
         raise SystemExit(1)
 
-    print("[*] Brute-force attack completed.")
-    print(f"[*] Total successful combinations: {len(known_success)}")
+    print(f"{timestamp()} [*] Brute-force attack completed.")
+    print(f"{timestamp()} [*] Total successful combinations: {len(known_success)}")
     if known_success:
-        print(f"[*] Successful combinations saved in {SUCCESS_FILE_PATH}.")
+        print(
+            f"{timestamp()} [*] Successful combinations saved in {SUCCESS_FILE_PATH}."
+        )
 
 
 if __name__ == "__main__":
