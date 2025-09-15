@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from typing import Optional, Tuple, Dict
-from utils.timestamp_utils import timestamp
+from utils.info_utils import timestamp
 from settings import (
     LOGIN_PAGE_URL,
     LOGIN_POST_URL,

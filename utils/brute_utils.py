@@ -2,7 +2,7 @@ import time
 import requests
 from typing import Set, Tuple
 from utils.files_utils import save_to_file
-from utils.timestamp_utils import timestamp
+from utils.info_utils import timestamp
 from utils.session_utils import refresh_session, fetch_login_form, extract_csrf
 from settings import (
     SUCCESS_FILE_PATH,

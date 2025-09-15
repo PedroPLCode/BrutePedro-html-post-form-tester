@@ -1,6 +1,6 @@
 import os
 from typing import Union, List, Set
-from utils.timestamp_utils import timestamp
+from utils.info_utils import timestamp
 from settings import (
     bold_text,
     red_bold,

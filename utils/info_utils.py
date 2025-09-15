@@ -1,6 +1,18 @@
 from typing import Set
-from utils.timestamp_utils import timestamp
+from datetime import datetime
 from settings import SUCCESS_FILE_PATH, bold_text, green_bold, reset_text
+
+
+def timestamp() -> str:
+    """Return the current timestamp as a formatted string.
+
+    The timestamp is formatted as ``[YYYY-MM-DD HH:MM:SS]`` using the
+    current local time.
+
+    Returns:
+        str: The current timestamp in square brackets.
+    """
+    return datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
 
 
 def create_results_summary(known_success: Set[str], success: bool) -> str:

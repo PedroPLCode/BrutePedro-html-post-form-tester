@@ -1,7 +1,38 @@
 import re
 from typing import Set
+from datetime import datetime
 import utils.info_utils as summary
 from settings import SUCCESS_FILE_PATH, bold_text, green_bold, reset_text
+
+
+def test_timestamp_is_parsable() -> None:
+    """Test that timestamp() produces a valid datetime string.
+
+    This test ensures that the string returned by timestamp() is:
+      * of type str
+      * properly formatted so it can be parsed by datetime.strptime()
+        using the format "[%Y-%m-%d %H:%M:%S]".
+
+    Raises:
+        AssertionError: If the return value is not a str or cannot be parsed.
+    """
+    ts = summary.timestamp()
+    assert isinstance(ts, str)
+    datetime.strptime(ts, "[%Y-%m-%d %H:%M:%S]")
+
+
+def test_timestamp_matches_regex() -> None:
+    """Test that timestamp() matches the expected regex format.
+
+    This test verifies that the string returned by timestamp() matches
+    the pattern ``[YYYY-MM-DD HH:MM:SS]``.
+
+    Raises:
+        AssertionError: If the timestamp string does not match the regex.
+    """
+    ts = summary.timestamp()
+    pattern = r"^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]$"
+    assert re.match(pattern, ts)
 
 
 def test_success_summary_with_results(monkeypatch) -> None:

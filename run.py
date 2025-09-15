@@ -2,8 +2,7 @@ from typing import Optional
 from utils.brute_utils import try_login
 from utils.session_utils import create_session
 from utils.files_utils import load_file, save_to_file
-from utils.info_utils import create_results_summary
-from utils.timestamp_utils import timestamp
+from utils.info_utils import create_results_summary, timestamp
 from settings import (
     USERNAMES_FILE_PATH,
     PASSWORDS_FILE_PATH,
