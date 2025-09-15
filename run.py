@@ -2,6 +2,7 @@ from typing import Optional
 from utils.brute_utils import try_login
 from utils.session_utils import create_session
 from utils.files_utils import load_file, save_to_file
+from utils.info_utils import create_results_summary
 from utils.timestamp_utils import timestamp
 from settings import (
     USERNAMES_FILE_PATH,
@@ -81,7 +82,7 @@ def run_brute_force() -> None:
                 _prev_len = len(combo)
                 if success:
                     print(f"\n{timestamp()} {green_bold}[+] Successful combination found: {combo}{reset_text}"
-                          f"\n{timestamp()} {bold_text}[?] Possible false positive, please verify manually.{reset_text}")
+                          f"\n{timestamp()} {bold_text}[?] It can be a false positive, please verify this credential manually.{reset_text}")
                 else:
                     print(f"\r{timestamp()} [-] Failed attempt: {combo}{padding}", end="", flush=True)
 
@@ -92,16 +93,14 @@ def run_brute_force() -> None:
             print(f"\n{timestamp()} {red_bold}[!] An unexpected error occurred: {e}. Saving progress and exiting.{reset_text}")
         if combo:
             save_to_file(PROGRESS_FILE_PATH, previous_tested_combo, overwrite=True)
-            print(f"{timestamp()} {bold_text}[*] Progress saved in {PROGRESS_FILE_PATH}.{reset_text}\n"
-                  f"{timestamp()} {green_bold if success else bold_text}[*] Total successful combinations: {len(known_success)}{reset_text}"
-                  f"{timestamp()} {'[?] Possible false positives, please verify manually.' if success else ''}")
+            print(f"{timestamp()} {bold_text}[*] Progress saved in {PROGRESS_FILE_PATH}.{reset_text}")
+        summary = create_results_summary(known_success, success)
+        print(summary)
         raise SystemExit(1)
 
-    print(f"{timestamp()} {bold_text}[*] Brute-force attack completed.{reset_text}\n"
-          f"{timestamp()} {green_bold if success else bold_text}[*] Total successful combinations: {len(known_success)}{reset_text}"
-          f"{timestamp()} {'[?] Possible false positives, please verify manually.' if success else ''}")
-    if known_success:
-        print(f"{timestamp()} {green_bold}[*] Successful combinations saved in {SUCCESS_FILE_PATH}.{reset_text}")
+    print(f"{timestamp()} {bold_text}[*] Brute-force attack completed.{reset_text}")
+    summary = create_results_summary(known_success, success)
+    print(summary)
 
 
 if __name__ == "__main__":
