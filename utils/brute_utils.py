@@ -11,6 +11,8 @@ from settings import (
     CSRF_PARAM_STRING,
     DELAY_BETWEEN_REQUESTS,
     MAX_ATTEMPTS_PER_SESSION,
+    red_bold,
+    reset_text
 )
 
 
@@ -78,13 +80,13 @@ def try_login(
             return False, attempt_counter
 
         if resp.status_code != 200:
-            print(f"{timestamp()} [!] Unexpected status {resp.status_code} for {combo}")
+            print(f"{timestamp()} {red_bold}[!] Unexpected status {resp.status_code} for {combo}{reset_text}")
             return False, attempt_counter + 1
 
         try:
             response_json = resp.json()
         except ValueError:
-            print(f"{timestamp()} [!] Non-JSON response for {combo}")
+            print(f"{timestamp()} {red_bold}[!] Non-JSON response for {combo}{reset_text}")
             return False, attempt_counter + 1
 
         if not response_json.get("error"):
@@ -94,8 +96,8 @@ def try_login(
             return True, attempt_counter + 1
 
     except requests.RequestException as e:
-        print(f"{timestamp()} [!] Request error for {combo} -> {e}")
+        print(f"{timestamp()} {red_bold}[!] Request error for {combo} -> {e}{reset_text}")
     except Exception as e:
-        print(f"{timestamp()} [!] Unexpected error for {combo} -> {e}")
+        print(f"{timestamp()} {red_bold}[!] Unexpected error for {combo} -> {e}{reset_text}")
 
     return False, attempt_counter + 1

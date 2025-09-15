@@ -9,6 +9,8 @@ from settings import (
     MAX_ATTEMPTS_PER_SESSION,
     HEADERS,
     CSRF_PARAM_STRING,
+    red_bold,
+    reset_text
 )
 
 
@@ -24,12 +26,12 @@ def create_session() -> Optional[requests.Session]:
     try:
         resp = session.get(LOGIN_PAGE_URL, timeout=10)
         if resp.status_code != 200:
-            print(f"{timestamp()} [!] Server returned status: {resp.status_code}")
+            print(f"{timestamp()} {red_bold}[!] Server returned status: {resp.status_code}{reset_text}")
             return None
         session.cookies.update(resp.cookies)
         print(f"{timestamp()} [*] Session created and initial cookies fetched.")
     except requests.RequestException as e:
-        print(f"{timestamp()} [!] Connection error: {e}")
+        print(f"{timestamp()} {red_bold}[!] Connection error: {e}{reset_text}")
         return None
     return session
 

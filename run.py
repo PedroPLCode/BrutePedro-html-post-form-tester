@@ -8,6 +8,10 @@ from settings import (
     PASSWORDS_FILE_PATH,
     SUCCESS_FILE_PATH,
     PROGRESS_FILE_PATH,
+    bold_text,
+    green_bold,
+    red_bold,
+    reset_text
 )
 
 _prev_len = 0
@@ -32,12 +36,12 @@ def run_brute_force() -> None:
     """
     global _prev_len
 
-    print(f"BrutePedro - html-post-form brute-force tool v1.0\n"
+    print(f"{bold_text}BrutePedro - html-post-form brute-force tester v1.0{reset_text}\n"
           f"{timestamp()} [*] Hello world! Preparing brute-force attack...")
 
     session = create_session()
     if not session:
-        print(f"{timestamp()} [!] Failed to create session.")
+        print(f"{timestamp()} {red_bold}[!] Failed to create session.{reset_text}")
         return
 
     known_success = load_file(SUCCESS_FILE_PATH, as_set=True)
@@ -48,7 +52,7 @@ def run_brute_force() -> None:
     usernames = load_file(USERNAMES_FILE_PATH)
     passwords = load_file(PASSWORDS_FILE_PATH)
     if not usernames or not passwords:
-        print(f"{timestamp()} [!] Username or password files are empty.")
+        print(f"{timestamp()} {red_bold}[!] Username or password files are empty.{reset_text}")
         return
 
     combo: Optional[str] = None
@@ -76,25 +80,25 @@ def run_brute_force() -> None:
                 padding = " " * max(0, _prev_len - len(combo))
                 _prev_len = len(combo)
                 if success:
-                    print(f"\n{timestamp()} [+] Successful combination found: {combo}")
+                    print(f"\n{timestamp()} {green_bold}[+] Successful combination found: {combo}{reset_text}")
                 else:
                     print(f"\r{timestamp()} [-] Failed attempt: {combo}{padding}", end="", flush=True)
 
     except (KeyboardInterrupt, Exception) as e:
         if isinstance(e, KeyboardInterrupt):
-            print(f"\n{timestamp()} [!] Interrupted by user. Saving progress and exiting.")
+            print(f"\n{timestamp()} {bold_text}[!] Interrupted by user. Saving progress and exiting.{reset_text}")
         else:
-            print(f"\n{timestamp()} [!] An unexpected error occurred: {e}. Saving progress and exiting.")
+            print(f"\n{timestamp()} {red_bold}[!] An unexpected error occurred: {e}. Saving progress and exiting.{reset_text}")
         if combo:
             save_to_file(PROGRESS_FILE_PATH, previous_tested_combo, overwrite=True)
-            print(f"{timestamp()} [*] Progress saved in {PROGRESS_FILE_PATH}.\n"
-                  f"{timestamp()} [*] Total successful combinations: {len(known_success)}")
+            print(f"{timestamp()} {bold_text}[*] Progress saved in {PROGRESS_FILE_PATH}.{reset_text}\n"
+                  f"{timestamp()} {green_bold if success else bold_text}[*] Total successful combinations: {len(known_success)}{reset_text}")
         raise SystemExit(1)
 
-    print(f"{timestamp()} [*] Brute-force attack completed.\n"
-          f"{timestamp()} [*] Total successful combinations: {len(known_success)}")
+    print(f"{timestamp()} {bold_text}[*] Brute-force attack completed.{reset_text}\n"
+          f"{timestamp()} {green_bold if success else bold_text}[*] Total successful combinations: {len(known_success)}{reset_text}")
     if known_success:
-        print(f"{timestamp()} [*] Successful combinations saved in {SUCCESS_FILE_PATH}.")
+        print(f"{timestamp()} {green_bold}[*] Successful combinations saved in {SUCCESS_FILE_PATH}.{reset_text}")
 
 
 if __name__ == "__main__":

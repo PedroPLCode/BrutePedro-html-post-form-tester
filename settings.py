@@ -19,6 +19,10 @@ Attributes:
     USERNAME_PARAM_STRING (str): The form parameter name for the username field in the login form.
     PASSWORD_PARAM_STRING (str): The form parameter name for the password field in the login form.
     CSRF_PARAM_STRING (str): The form parameter name for the CSRF token field in the login form.
+    bold_text (str): ANSI escape code for bold text formatting in terminal
+    green_bold (str): ANSI escape code for green bold text formatting in terminal
+    red_bold (str): ANSI escape code for red bold text formatting in terminal
+    reset_text (str): ANSI escape code to reset text formatting in terminal
 """
 
 LOGIN_PAGE_URL: str = "https://example.com/apps/tncms/login.cms"
@@ -50,3 +54,8 @@ PROGRESS_FILE_PATH: str = f"{DATA_DIR}/progress.brute"
 USERNAME_PARAM_STRING: str = "username"
 PASSWORD_PARAM_STRING: str = "password"
 CSRF_PARAM_STRING: str = "csrf_token"
+
+bold_text = "\033[1m"
+green_bold = "\033[1;32m"
+red_bold = "\033[1;31m"
+reset_text = "\033[0m"

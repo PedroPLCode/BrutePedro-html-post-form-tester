@@ -1,6 +1,11 @@
 import os
 from typing import Union, List, Set
 from utils.timestamp_utils import timestamp
+from settings import (
+    bold_text,
+    red_bold,
+    reset_text
+)
 
 
 def load_file(filepath: str, as_set: bool = False) -> Union[List[str], Set[str]]:
@@ -22,11 +27,11 @@ def load_file(filepath: str, as_set: bool = False) -> Union[List[str], Set[str]]
             print(f"{timestamp()} [*] Loaded {len(data)} records from {filepath}")
             return set(data) if as_set else data
         print(
-            f"{timestamp()} [*] File {filepath} does not exist, creating empty structure."
+            f"{timestamp()} {bold_text}[*] File {filepath} does not exist, creating empty structure.{reset_text}"
         )
         return set() if as_set else []
     except Exception as e:
-        print(f"{timestamp()} [!] Error reading file {filepath}: {e}")
+        print(f"{timestamp()} {red_bold}[!] Error reading file {filepath}: {e}{reset_text}")
         return set() if as_set else []
 
 
@@ -48,4 +53,4 @@ def save_to_file(filepath: str, combo: str, overwrite: bool = False) -> None:
         with open(filepath, mode, encoding="utf-8") as f:
             f.write(f"{combo}\n")
     except Exception as e:
-        print(f"{timestamp()} [!] Error writing to file {filepath}: {e}")
+        print(f"{timestamp()} {red_bold}[!] Error writing to file {filepath}: {e}{reset_text}")
