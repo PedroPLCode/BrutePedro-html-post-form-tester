@@ -32,8 +32,8 @@ def run_brute_force() -> None:
     """
     global _prev_len
 
-    print(f"BrutePedro - html-post-form brute-force tool v1.0")
-    print(f"{timestamp()} [*] Hello world! Preparing brute-force attack...")
+    print(f"BrutePedro - html-post-form brute-force tool v1.0\n"
+          f"{timestamp()} [*] Hello world! Preparing brute-force attack...")
 
     session = create_session()
     if not session:
@@ -87,12 +87,12 @@ def run_brute_force() -> None:
             print(f"\n{timestamp()} [!] An unexpected error occurred: {e}. Saving progress and exiting.")
         if combo:
             save_to_file(PROGRESS_FILE_PATH, previous_tested_combo, overwrite=True)
-            print(f"{timestamp()} [*] Progress saved in {PROGRESS_FILE_PATH}.")
-            print(f"{timestamp()} [*] Total successful combinations: {len(known_success)}")
+            print(f"{timestamp()} [*] Progress saved in {PROGRESS_FILE_PATH}.\n"
+                  f"{timestamp()} [*] Total successful combinations: {len(known_success)}")
         raise SystemExit(1)
 
-    print(f"{timestamp()} [*] Brute-force attack completed.")
-    print(f"{timestamp()} [*] Total successful combinations: {len(known_success)}")
+    print(f"{timestamp()} [*] Brute-force attack completed.\n"
+          f"{timestamp()} [*] Total successful combinations: {len(known_success)}")
     if known_success:
         print(f"{timestamp()} [*] Successful combinations saved in {SUCCESS_FILE_PATH}.")
 
