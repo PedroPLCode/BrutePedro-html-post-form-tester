@@ -20,6 +20,7 @@ Attributes:
     PASSWORD_PARAM_STRING (str): The form parameter name for the password field in the login form.
     CSRF_PARAM_STRING (str): The form parameter name for the CSRF token field in the login form.
     WRONG_CREDENTIALS_MESSAGE (str): Message indicating wrong credentials in the response.
+    SUCCESSFUL_LOGIN_MESSAGE (str): Message indicating a successful login in the response.
     bold_text (str): ANSI escape code for bold text formatting in terminal
     green_bold (str): ANSI escape code for green bold text formatting in terminal
     red_bold (str): ANSI escape code for red bold text formatting in terminal
@@ -56,6 +57,7 @@ USERNAME_PARAM_STRING: str = "username"
 PASSWORD_PARAM_STRING: str = "password"
 CSRF_PARAM_STRING: str = "csrf_token"
 WRONG_CREDENTIALS_MESSAGE: str = "Błędne dane logowania"
+SUCCESSFUL_LOGIN_MESSAGE: str = "Logowanie powiodło się"
 
 bold_text: str = "\033[1m"
 green_bold: str = "\033[1;32m"

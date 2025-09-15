@@ -12,6 +12,7 @@ from settings import (
     DELAY_BETWEEN_REQUESTS,
     MAX_ATTEMPTS_PER_SESSION,
     WRONG_CREDENTIALS_MESSAGE,
+    SUCCESSFUL_LOGIN_MESSAGE,
     red_bold,
     reset_text
 )
@@ -94,7 +95,8 @@ def try_login(
             not response_json.get("error"),
             response_json.get("clear"),
             response_json.get("link"),
-            WRONG_CREDENTIALS_MESSAGE not in response_json.get("message", "")
+            WRONG_CREDENTIALS_MESSAGE not in response_json.get("message", ""),
+            SUCCESSFUL_LOGIN_MESSAGE in response_json.get("message", "")
         ))
 
         if possible_success:

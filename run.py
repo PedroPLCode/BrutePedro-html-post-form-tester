@@ -80,7 +80,8 @@ def run_brute_force() -> None:
                 padding = " " * max(0, _prev_len - len(combo))
                 _prev_len = len(combo)
                 if success:
-                    print(f"\n{timestamp()} {green_bold}[+] Successful combination found: {combo}{reset_text}")
+                    print(f"\n{timestamp()} {green_bold}[+] Successful combination found: {combo}{reset_text}"
+                          f"\n{timestamp()} {bold_text}[?] Possible false positive, please verify manually.{reset_text}")
                 else:
                     print(f"\r{timestamp()} [-] Failed attempt: {combo}{padding}", end="", flush=True)
 
@@ -92,11 +93,13 @@ def run_brute_force() -> None:
         if combo:
             save_to_file(PROGRESS_FILE_PATH, previous_tested_combo, overwrite=True)
             print(f"{timestamp()} {bold_text}[*] Progress saved in {PROGRESS_FILE_PATH}.{reset_text}\n"
-                  f"{timestamp()} {green_bold if success else bold_text}[*] Total successful combinations: {len(known_success)}{reset_text}")
+                  f"{timestamp()} {green_bold if success else bold_text}[*] Total successful combinations: {len(known_success)}{reset_text}"
+                  f"{timestamp()} {'[?] Possible false positives, please verify manually.' if success else ''}")
         raise SystemExit(1)
 
     print(f"{timestamp()} {bold_text}[*] Brute-force attack completed.{reset_text}\n"
-          f"{timestamp()} {green_bold if success else bold_text}[*] Total successful combinations: {len(known_success)}{reset_text}")
+          f"{timestamp()} {green_bold if success else bold_text}[*] Total successful combinations: {len(known_success)}{reset_text}"
+          f"{timestamp()} {'[?] Possible false positives, please verify manually.' if success else ''}")
     if known_success:
         print(f"{timestamp()} {green_bold}[*] Successful combinations saved in {SUCCESS_FILE_PATH}.{reset_text}")
 

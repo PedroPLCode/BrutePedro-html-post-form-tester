@@ -1,7 +1,12 @@
 import pytest
 from unittest.mock import Mock
 from utils.brute_utils import try_login
-from settings import USERNAME_PARAM_STRING, PASSWORD_PARAM_STRING
+from settings import (
+    USERNAME_PARAM_STRING,
+    PASSWORD_PARAM_STRING,
+    WRONG_CREDENTIALS_MESSAGE,
+    SUCCESSFUL_LOGIN_MESSAGE
+)
 
 
 @pytest.fixture
@@ -35,9 +40,19 @@ def mock_session():
                 data[USERNAME_PARAM_STRING] == "admin"
                 and data[PASSWORD_PARAM_STRING] == "123"
             ):
-                resp.json.return_value = {"error": False}
+                resp.json.return_value = {
+                    "error": False,
+                    "clear": True,
+                    "link": True,
+                    "message": SUCCESSFUL_LOGIN_MESSAGE
+                }
             else:
-                resp.json.return_value = {"error": True}
+                resp.json.return_value = {
+                    "error": True,
+                    "clear": False,
+                    "link": False,
+                    "message": WRONG_CREDENTIALS_MESSAGE
+                }
             resp.cookies = {}
             return resp
 
