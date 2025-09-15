@@ -1,6 +1,7 @@
 # BrutePedro — HTML POST form tester
 BrutePedro is a small Python tool for testing HTML POST login forms that use CSRF tokens / AJAX.
 It is designed for authorized penetration testing only and includes resumable bruteforce logic, CSRF handling, and unit tests that run without hitting the network (they use mocks).
+<br>Current version: 1.0
 
 ### Note
 This script was developed for a concrete test I performed and is focused on that task. You’re encouraged to adapt and extend it to meet your own requirements. Suggestions, comments and feedback are much appreciated!

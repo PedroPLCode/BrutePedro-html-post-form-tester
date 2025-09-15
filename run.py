@@ -32,6 +32,9 @@ def run_brute_force() -> None:
     """
     global _prev_len
 
+    print(f"BrutePedro - html-post-form brute-force tool v1.0")
+    print(f"{timestamp()} [*] Hello world! Preparing brute-force attack...")
+
     session = create_session()
     if not session:
         print(f"{timestamp()} [!] Failed to create session.")
