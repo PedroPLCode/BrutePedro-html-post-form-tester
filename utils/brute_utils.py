@@ -11,6 +11,7 @@ from settings import (
     CSRF_PARAM_STRING,
     DELAY_BETWEEN_REQUESTS,
     MAX_ATTEMPTS_PER_SESSION,
+    WRONG_CREDENTIALS_MESSAGE,
     red_bold,
     reset_text
 )
@@ -89,7 +90,14 @@ def try_login(
             print(f"{timestamp()} {red_bold}[!] Non-JSON response for {combo}{reset_text}")
             return False, attempt_counter + 1
 
-        if not response_json.get("error"):
+        possible_success = any((
+            not response_json.get("error"),
+            response_json.get("clear"),
+            response_json.get("link"),
+            WRONG_CREDENTIALS_MESSAGE not in response_json.get("message", "")
+        ))
+
+        if possible_success:
             if combo not in known_success:
                 save_to_file(SUCCESS_FILE_PATH, combo)
                 known_success.add(combo)

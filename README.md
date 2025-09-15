@@ -50,6 +50,7 @@ PROGRESS_FILE_PATH = f"{DATA_DIR}/progress.brute"
 USERNAME_PARAM_STRING = "username"
 PASSWORD_PARAM_STRING = "password"
 CSRF_PARAM_STRING = "csrf_token"
+WRONG_CREDENTIALS_MESSAGE = "Login or password invalid"
 
 ```
 Place your usernames.txt and passwords.txt files into the data/ folder (or change the paths accordingly).
