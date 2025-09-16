@@ -5,6 +5,7 @@ from utils.files_utils import save_to_file
 from utils.info_utils import timestamp
 from utils.session_utils import refresh_session, fetch_login_form, extract_csrf
 from settings import (
+    REDIRECT_URL,
     SUCCESS_FILE_PATH,
     USERNAME_PARAM_STRING,
     PASSWORD_PARAM_STRING,
@@ -63,7 +64,7 @@ def try_login(
     payload = {
         USERNAME_PARAM_STRING: username,
         PASSWORD_PARAM_STRING: password,
-        "redirect": form_values.get("redirect", "/apps/tncms/login.cms"),
+        "redirect": form_values.get("redirect", REDIRECT_URL),
     }
     csrf_val = extract_csrf(form_values)
     if csrf_val:
@@ -91,7 +92,7 @@ def try_login(
             print(f"{timestamp()} {red_bold}[!] Non-JSON response for {combo}{reset_text}")
             return False, attempt_counter + 1
 
-        possible_success = any((
+        possible_success: bool = any((
             not response_json.get("error"),
             response_json.get("clear"),
             response_json.get("link"),

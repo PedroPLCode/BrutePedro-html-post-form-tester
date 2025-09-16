@@ -46,7 +46,7 @@ def test_success_summary_with_results(monkeypatch) -> None:
     """
     monkeypatch.setattr(summary, "timestamp", lambda: "[2025-09-15 12:00:00]")
     known_success: Set[str] = {"user1:pass1", "user2:pass2"}
-    result = summary.create_results_summary(known_success, success=True)
+    result = summary.create_results_summary(known_success, possible_success=True)
 
     assert isinstance(result, str)
     assert "[2025-09-15 12:00:00]" in result
@@ -58,7 +58,7 @@ def test_success_summary_with_results(monkeypatch) -> None:
     assert reset_text in result
 
     timestamps = re.findall(r"\[2025-09-15 12:00:00\]", result)
-    assert len(timestamps) == 3
+    assert len(timestamps) == 4
 
 
 def test_success_summary_no_results(monkeypatch) -> None:
@@ -71,7 +71,7 @@ def test_success_summary_no_results(monkeypatch) -> None:
     """
     monkeypatch.setattr(summary, "timestamp", lambda: "[2025-09-15 12:00:00]")
     known_success: Set[str] = set()
-    result = summary.create_results_summary(known_success, success=False)
+    result = summary.create_results_summary(known_success, possible_success=False)
 
     assert isinstance(result, str)
     assert "[2025-09-15 12:00:00]" in result
@@ -80,4 +80,4 @@ def test_success_summary_no_results(monkeypatch) -> None:
     assert reset_text in result
 
     timestamps = re.findall(r"\[2025-09-15 12:00:00\]", result)
-    assert len(timestamps) == 1
+    assert len(timestamps) == 4

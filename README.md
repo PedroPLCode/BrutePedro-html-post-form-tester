@@ -35,9 +35,8 @@ Edit settings.py to point to the target and data directory
 ```bash
 LOGIN_PAGE_URL = "https://example.com/apps/login"
 LOGIN_POST_URL = "https://example.com/login"
-HEADERS = {
-    "default_session_headers"
-}
+REDIRECT_URL = "/apps/login"
+HEADERS = {"default_session_headers"}
 DELAY_BETWEEN_REQUESTS = in seconds
 MAX_ATTEMPTS_PER_SESSION = int
 

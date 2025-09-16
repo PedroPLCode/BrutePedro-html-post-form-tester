@@ -9,6 +9,7 @@ from settings import (
     MAX_ATTEMPTS_PER_SESSION,
     HEADERS,
     CSRF_PARAM_STRING,
+    bold_text,
     red_bold,
     reset_text
 )
@@ -29,7 +30,12 @@ def create_session() -> Optional[requests.Session]:
             print(f"{timestamp()} {red_bold}[!] Server returned status: {resp.status_code}{reset_text}")
             return None
         session.cookies.update(resp.cookies)
+        headers_correct: bool = all(
+            session.headers.get(k) == v for k, v in HEADERS.items()
+        )
         print(f"{timestamp()} [*] Session created and initial cookies fetched.")
+        print(f"{timestamp()} [*] Session cookies: {bold_text}{session.cookies.get_dict()}{reset_text}")
+        print(f"{timestamp()} [*] Session headers correct: {bold_text}{headers_correct}{reset_text}")
     except requests.RequestException as e:
         print(f"{timestamp()} {red_bold}[!] Connection error: {e}{reset_text}")
         return None
