@@ -10,6 +10,11 @@ from settings import (
     USERNAME_PARAM_STRING,
     PASSWORD_PARAM_STRING,
     CSRF_PARAM_STRING,
+    REDIRECT_PARAM_STRING,
+    ERROR_PARAM_STRING,
+    CLEAR_PARAM_STRING,
+    LINK_PARAM_STRING,
+    MESSAGE_PARAM_STRING,
     DELAY_BETWEEN_REQUESTS,
     MAX_ATTEMPTS_PER_SESSION,
     WRONG_CREDENTIALS_MESSAGE,
@@ -64,7 +69,7 @@ def try_login(
     payload = {
         USERNAME_PARAM_STRING: username,
         PASSWORD_PARAM_STRING: password,
-        "redirect": form_values.get("redirect", REDIRECT_URL),
+        REDIRECT_PARAM_STRING: form_values.get(REDIRECT_PARAM_STRING, REDIRECT_URL),
     }
     csrf_val = extract_csrf(form_values)
     if csrf_val:
@@ -85,22 +90,21 @@ def try_login(
         if resp.status_code != 200:
             print(f"{timestamp()} {red_bold}[!] Unexpected status {resp.status_code} for {combo}{reset_text}")
             return False, attempt_counter + 1
-
         try:
             response_json = resp.json()
         except ValueError:
             print(f"{timestamp()} {red_bold}[!] Non-JSON response for {combo}{reset_text}")
             return False, attempt_counter + 1
 
-        possible_success: bool = any((
-            not response_json.get("error"),
-            response_json.get("clear"),
-            response_json.get("link"),
-            WRONG_CREDENTIALS_MESSAGE not in response_json.get("message", ""),
-            SUCCESSFUL_LOGIN_MESSAGE in response_json.get("message", "")
+        is_possible_success: bool = any((
+            not response_json.get(ERROR_PARAM_STRING),
+            response_json.get(CLEAR_PARAM_STRING),
+            response_json.get(LINK_PARAM_STRING),
+            WRONG_CREDENTIALS_MESSAGE not in response_json.get(MESSAGE_PARAM_STRING, ""),
+            SUCCESSFUL_LOGIN_MESSAGE in response_json.get(MESSAGE_PARAM_STRING, "")
         ))
 
-        if possible_success:
+        if is_possible_success:
             if combo not in known_success:
                 save_to_file(SUCCESS_FILE_PATH, combo)
                 known_success.add(combo)

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Set, Union, List
 from utils.brute_utils import try_login
 from utils.session_utils import create_session
 from utils.files_utils import load_file, save_to_file
@@ -44,21 +44,29 @@ def run_brute_force() -> None:
         print(f"{timestamp()} {red_bold}[!] Failed to create session.{reset_text}")
         return
 
-    known_success = load_file(SUCCESS_FILE_PATH, as_set=True)
-    progress_list = load_file(PROGRESS_FILE_PATH)
+    known_success: Union[List[str], Set[str]] = load_file(SUCCESS_FILE_PATH, as_set=True)
+    progress_list: Union[List[str], Set[str]] = load_file(PROGRESS_FILE_PATH)
     last_saved_combo: Optional[str] = progress_list[-1] if progress_list else None
     resume: bool = last_saved_combo is None
+    possible_success: bool = False
 
     usernames = load_file(USERNAMES_FILE_PATH)
     passwords = load_file(PASSWORDS_FILE_PATH)
     if not usernames or not passwords:
         print(f"{timestamp()} {red_bold}[!] Username or password files are empty.{reset_text}")
         return
-    
+
+    combinations_to_test = len(usernames) * len(passwords)
+    print(f"{timestamp()} [*] Combinations to test: {bold_text}{combinations_to_test}{reset_text}")
+
     if resume:
         print(f"{timestamp()} {bold_text}[*] No previous progress found. Starting from the beginning.{reset_text}")
     else:
-        print(f"{timestamp()} {bold_text}[*] Resuming from last saved combination: {last_saved_combo}{reset_text}")
+        current_index: int = (usernames.index(last_saved_combo.split(':')[0]) * len(passwords) +
+                         passwords.index(last_saved_combo.split(':')[1]) + 1) if last_saved_combo else 0
+        print(f"{timestamp()} {bold_text}[*] Last saved combination index: {current_index}{reset_text}\n"
+            f"{timestamp()} {bold_text}[*] Last saved combination: {last_saved_combo}{reset_text}\n"
+            f"{timestamp()} {bold_text}[*] Resuming from last saved combination.{reset_text}")
 
     combo: Optional[str] = None
     previous_tested_combo: Optional[str] = None
@@ -80,10 +88,10 @@ def run_brute_force() -> None:
                     session, known_success, username, password, attempt_counter
                 )
                 save_to_file(PROGRESS_FILE_PATH, combo, overwrite=True)
-                previous_tested_combo = combo
+                previous_tested_combo: Optional[str] = combo
 
-                attempt = len(passwords) * usernames.index(username) + passwords.index(password) + 1
-                total = len(usernames) * len(passwords)
+                attempt: int = len(passwords) * usernames.index(username) + passwords.index(password) + 1
+                total: int = len(usernames) * len(passwords)
 
                 padding = " " * max(0, _prev_len - len(combo))
                 _prev_len = len(combo)

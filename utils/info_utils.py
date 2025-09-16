@@ -11,6 +11,7 @@ from settings import  (
     REDIRECT_URL,
     DELAY_BETWEEN_REQUESTS,
     MAX_ATTEMPTS_PER_SESSION,
+    SUCCESS_FILE_PATH,
 )
 
 
@@ -80,7 +81,7 @@ def create_results_summary(known_success: Set[str], possible_success: bool) -> s
         )
         
     results_summary.append(
-        f"{timestamp()} {bold_text}[*] BrutePedro out for the day!{reset_text}"
+        f"{timestamp()} [*] BrutePedro out for the day!"
     )
 
     return "".join(results_summary)

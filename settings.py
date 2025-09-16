@@ -20,6 +20,11 @@ Attributes:
     USERNAME_PARAM_STRING (str): The form parameter name for the username field in the login form.
     PASSWORD_PARAM_STRING (str): The form parameter name for the password field in the login form.
     CSRF_PARAM_STRING (str): The form parameter name for the CSRF token field in the login form.
+    REDIRECT_PARAM_STRING (str): The form parameter name for the redirect field in the login form.
+    ERROR_PARAM_STRING (str): Key in the JSON response indicating an error.
+    CLEAR_PARAM_STRING (str): Key in the JSON response indicating a clear status.
+    LINK_PARAM_STRING (str): Key in the JSON response indicating a link.
+    MESSAGE_PARAM_STRING (str): Key in the JSON response containing a message.
     WRONG_CREDENTIALS_MESSAGE (str): Message indicating wrong credentials in the response.
     SUCCESSFUL_LOGIN_MESSAGE (str): Message indicating a successful login in the response.
     bold_text (str): ANSI escape code for bold text formatting in terminal
@@ -59,6 +64,11 @@ PROGRESS_FILE_PATH: str = f"{DATA_DIR}/progress.brute"
 USERNAME_PARAM_STRING: str = "username"
 PASSWORD_PARAM_STRING: str = "password"
 CSRF_PARAM_STRING: str = "csrf_token"
+REDIRECT_PARAM_STRING: str = "redirect"
+ERROR_PARAM_STRING: str = "error"
+CLEAR_PARAM_STRING: str = "clear"
+LINK_PARAM_STRING: str = "link"
+MESSAGE_PARAM_STRING: str = "message"
 WRONG_CREDENTIALS_MESSAGE: str = "Błędne dane logowania"
 SUCCESSFUL_LOGIN_MESSAGE: str = "Logowanie powiodło się"
 
