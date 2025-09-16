@@ -30,7 +30,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Preparaion
+### Preparation
 Edit settings.py to point to the target and data directory
 ```bash
 LOGIN_PAGE_URL = "https://example.com/apps/login"
@@ -51,6 +51,7 @@ USERNAME_PARAM_STRING = "username"
 PASSWORD_PARAM_STRING = "password"
 CSRF_PARAM_STRING = "csrf_token"
 WRONG_CREDENTIALS_MESSAGE = "Login or password invalid"
+SUCCESSFUL_LOGIN_MESSAGE = "If known"
 
 ```
 Place your usernames.txt and passwords.txt files into the data/ folder (or change the paths accordingly).
@@ -59,7 +60,7 @@ Place your usernames.txt and passwords.txt files into the data/ folder (or chang
 ```bash
 python run.py
 ```
-Press CTRL+C to stop — the script will save the current progress to data/progress.brute and exit.
+Press CTRL+C to stop — the script will save the current progress to data/progress.brute and exit.<br><br>
 Alternatively, run in background and redirect output to a file.
 ```bash
 nohup python run.py > output.log 2>&1 &
@@ -70,7 +71,7 @@ Run tests from project root so Python finds the utils package:
 ```bash
 pytest -v
 ```
-Tests use mocks to simulate HTTP responses (CSRF token, POST responses). They do not perform real network calls.
+Tests use mocks to simulate HTTP responses (CSRF token, POST responses). They do not perform real network calls.<br><br>
 If pytest says ModuleNotFoundError: No module named 'utils', run it from the repository root or set PYTHONPATH:
 ```bash
 PYTHONPATH=$(pwd) pytest -v
