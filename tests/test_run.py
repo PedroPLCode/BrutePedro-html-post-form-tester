@@ -25,8 +25,8 @@ def test_run_brute_force_success(tmp_path):
         - The save_to_file function is called to save progress.
     """
     known_success = set()
-    usernames = ["user1", "user2"]
-    passwords = ["pass1", "pass2"]
+    usernames = ["user1", "user2", "user3", "user4", "user5"]
+    passwords = ["pass1", "pass2", "pass3", "pass4", "pass5"]
 
     def load_file_side_effect(filepath, as_set=False):
         if filepath == SUCCESS_FILE_PATH:

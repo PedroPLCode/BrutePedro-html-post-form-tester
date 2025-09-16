@@ -60,6 +60,10 @@ Place your usernames.txt and passwords.txt files into the data/ folder (or chang
 python run.py
 ```
 Press CTRL+C to stop — the script will save the current progress to data/progress.brute and exit.
+Alternatively, run in background and redirect output to a file.
+```bash
+nohup python run.py > output.log 2>&1 &
+```
 
 ### Testing
 Run tests from project root so Python finds the utils package:

@@ -4,8 +4,8 @@ Module Constants
 This module defines the constants used by the brute-force login script.
 
 Attributes:
-    LOGIN_PAGE_URL (str): URL of the login page where CSRF token is fetched.
-    LOGIN_POST_URL (str): URL of the POST endpoint to submit login requests.
+    LOGIN_PAGE_URL (str): Full URL of the login page where CSRF token is fetched including port to connect.
+    LOGIN_POST_URL (str): Full URL of the POST endpoint to submit login requests including port to connect.
     HEADERS (dict): Default headers for the HTTP session.
     DELAY_BETWEEN_REQUESTS (float): Delay in seconds between login attempts to avoid rate limiting.
     MAX_ATTEMPTS_PER_SESSION (int): Number of login attempts before refreshing the session.
