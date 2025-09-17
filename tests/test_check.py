@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from check import check_server_before_brute_force
+from core.check import check_server_before_brute_force
 from settings import DUMMY_USERNAME, DUMMY_PASSWORD
 
 
@@ -92,7 +92,7 @@ def test_check_server_session_fail(capsys):
     Args:
         capsys (pytest fixture): Capture system output.
     """
-    with patch("check.create_session", return_value=None):
+    with patch("core.check.create_session", return_value=None):
         check_server_before_brute_force()
     captured = capsys.readouterr()
     assert "Failed to create session" in captured.out
@@ -117,10 +117,10 @@ def test_check_server_invalid_json(capsys):
             mock_resp.json.side_effect = ValueError("No JSON")
             return mock_resp
 
-    with patch("check.create_session", return_value=MockBadJSONSession()), patch(
-        "check.fetch_login_form",
+    with patch("core.check.create_session", return_value=MockBadJSONSession()), patch(
+        "core.check.fetch_login_form",
         return_value=("http://example.com/login", {"redirect": "/dashboard"}),
-    ), patch("check.extract_csrf", return_value=None):
+    ), patch("core.check.extract_csrf", return_value=None):
         check_server_before_brute_force()
     captured = capsys.readouterr()
     assert "Response is not valid JSON" in captured.out

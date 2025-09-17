@@ -33,6 +33,9 @@ def check_server_before_brute_force() -> None:
     Raises:
         SystemExit: If an unexpected error occurs during execution.
     """
+    
+    print (f"{bold_text}BrutePedro - html-post-form brute-force tester v1.0{reset_text}\n"
+          f"{timestamp()} [*] Hello world! Let's check server and response before brute-force attack.")
         
     try:
         session = create_session()

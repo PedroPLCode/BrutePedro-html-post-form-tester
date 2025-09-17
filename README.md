@@ -74,19 +74,19 @@ Place your usernames.txt and passwords.txt files into the data/ folder (or chang
 ### Usage
 Run server checks.
 ```bash
-python check.py
+python main.py check
 ```
 Start brute attack.
 ```bash
-python attack.py
+python main.py attack
 ```
 Press CTRL+C to stop — the script will save the current progress to data/progress.brute and exit.<br><br>
 Alternatively, run scripts in background and redirect output to a file.
 ```bash
-nohup python attack.py > data/brute_attack.log 2>&1 &
+nohup python main.py attack > data/brute_attack.log 2>&1 &
 ```
 ```bash
-nohup python check.py > data/server_check.log 2>&1 &
+nohup python main.py check > data/server_check.log 2>&1 &
 ```
 
 ### Testing
