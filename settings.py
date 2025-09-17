@@ -10,6 +10,8 @@ Attributes:
     HEADERS (dict): Default headers for the HTTP session.
     DELAY_BETWEEN_REQUESTS (float): Delay in seconds between login attempts to avoid rate limiting.
     MAX_ATTEMPTS_PER_SESSION (int): Number of login attempts before refreshing the session.
+    DUMMY_USERNAME (str): Usermane used only to check server status and response.
+    DUMMY_PASSWORD:(str): Password used only to check server status and response.
     DATA_DIR (str): Directory where data files are stored.
     USERNAMES_FILE (str): Path to the file containing username list.
     PASSWORDS_FILE (str): Path to the file containing password list.
@@ -54,6 +56,8 @@ HEADERS: dict[str, str] = {
 }
 DELAY_BETWEEN_REQUESTS: float = 1.5
 MAX_ATTEMPTS_PER_SESSION: int = 25
+DUMMY_USERNAME: str = "dummy_username"
+DUMMY_PASSWORD: str = "dummy_password"
 
 DATA_DIR: str = "data"
 USERNAMES_FILE_PATH: str = f"{DATA_DIR}/usernames.txt"

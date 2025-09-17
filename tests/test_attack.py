@@ -1,5 +1,5 @@
 from unittest.mock import patch, Mock
-from run import run_brute_force
+from attack import run_brute_force_attack
 from settings import (
     USERNAMES_FILE_PATH,
     PASSWORDS_FILE_PATH,
@@ -39,9 +39,9 @@ def test_run_brute_force_success(tmp_path):
             return passwords
         return []
 
-    with patch("run.create_session") as mock_create_session, patch(
-        "run.load_file", side_effect=load_file_side_effect
-    ), patch("run.save_to_file") as mock_save, patch("run.try_login") as mock_try_login:
+    with patch("attack.create_session") as mock_create_session, patch(
+        "attack.load_file", side_effect=load_file_side_effect
+    ), patch("attack.save_to_file") as mock_save, patch("attack.try_login") as mock_try_login:
 
         mock_create_session.return_value = Mock()
 
@@ -52,7 +52,7 @@ def test_run_brute_force_success(tmp_path):
 
         mock_try_login.side_effect = try_login_side_effect
 
-        run_brute_force()
+        run_brute_force_attack()
 
         for u in usernames:
             for p in passwords:

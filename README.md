@@ -14,6 +14,15 @@ This script was developed for a concrete test I performed and is focused on that
 - Configurable delay between requests to reduce server load.
 - Unit tests with pytest and unittest.mock — no real network needed for tests.
 
+### Server Pre-Check Before Brute Force
+This project includes a utility function that performs preliminary checks on the target server before any brute force attempts are made.  
+- Creates a new HTTP session.
+- Fetches the login form and extracts relevant parameters.
+- Builds a payload with dummy credentials and optional CSRF token.
+- Sends a test login request to the server.
+- Prints detailed debug information about the request and response.
+- Optionally, you can save the full check result to a file for later analysis.
+
 ### WARNING / Legal / Ethics
 You must have explicit permission from the owner of the target system before running attacks or brute-force tests. Unauthorized testing is illegal and unethical. Use this tool only on systems you own or where you have written authorization.
 
@@ -39,6 +48,8 @@ REDIRECT_URL = "/apps/login"
 HEADERS = {"default_session_headers"}
 DELAY_BETWEEN_REQUESTS = in seconds
 MAX_ATTEMPTS_PER_SESSION = int
+DUMMY_USERNAME: str = "dummy_username"
+DUMMY_PASSWORD: str = "dummy_password"
 
 DATA_DIR = "data"
 USERNAMES_FILE_PATH = f"{DATA_DIR}/usernames.txt"
@@ -61,13 +72,21 @@ SUCCESSFUL_LOGIN_MESSAGE = "If known"
 Place your usernames.txt and passwords.txt files into the data/ folder (or change the paths accordingly).
 
 ### Usage
+Run server checks.
 ```bash
-python run.py
+python check.py
+```
+Start brute attack.
+```bash
+python attack.py
 ```
 Press CTRL+C to stop — the script will save the current progress to data/progress.brute and exit.<br><br>
-Alternatively, run in background and redirect output to a file.
+Alternatively, run scripts in background and redirect output to a file.
 ```bash
-nohup python run.py > output.log 2>&1 &
+nohup python attack.py > data/brute_attack.log 2>&1 &
+```
+```bash
+nohup python check.py > data/server_check.log 2>&1 &
 ```
 
 ### Testing

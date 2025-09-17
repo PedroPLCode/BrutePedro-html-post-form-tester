@@ -17,7 +17,7 @@ from settings import (
 _prev_len = 0
 
 
-def run_brute_force() -> None:
+def run_brute_force_attack() -> None:
     """
     Executes a brute-force attack using username and password lists.
 
@@ -118,4 +118,4 @@ def run_brute_force() -> None:
 
 
 if __name__ == "__main__":
-    run_brute_force()
+    run_brute_force_attack()

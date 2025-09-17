@@ -26,7 +26,7 @@ def create_session() -> Optional[requests.Session]:
     session.headers.update(HEADERS)
     try:
         resp = session.get(LOGIN_PAGE_URL, timeout=10)
-        #print(f"{timestamp()} [DEBUG] create_session() resp: {resp} ")
+        #print(f"{timestamp()} [DEBUG] create_session() resp: {resp}")
         if resp.status_code != 200:
             print(f"{timestamp()} {red_bold}[!] Server returned status: {resp.status_code}{reset_text}")
             return None
