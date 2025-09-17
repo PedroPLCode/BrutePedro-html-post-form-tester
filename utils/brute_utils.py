@@ -77,6 +77,7 @@ def try_login(
 
     try:
         resp = session.post(post_url, data=payload, timeout=15)
+        #print(f"{timestamp()} [DEBUG] try_login() resp: {resp}")
         session.cookies.update(resp.cookies)
         time.sleep(DELAY_BETWEEN_REQUESTS)
 

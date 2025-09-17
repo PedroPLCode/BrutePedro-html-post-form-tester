@@ -26,6 +26,7 @@ def create_session() -> Optional[requests.Session]:
     session.headers.update(HEADERS)
     try:
         resp = session.get(LOGIN_PAGE_URL, timeout=10)
+        #print(f"{timestamp()} [DEBUG] create_session() resp: {resp} ")
         if resp.status_code != 200:
             print(f"{timestamp()} {red_bold}[!] Server returned status: {resp.status_code}{reset_text}")
             return None
@@ -33,9 +34,9 @@ def create_session() -> Optional[requests.Session]:
         headers_correct: bool = all(
             session.headers.get(k) == v for k, v in HEADERS.items()
         )
-        print(f"{timestamp()} [*] Session created and initial cookies fetched.")
-        print(f"{timestamp()} [*] Session cookies: {bold_text}{session.cookies.get_dict()}{reset_text}")
-        print(f"{timestamp()} [*] Session headers correct: {bold_text}{headers_correct}{reset_text}")
+        print(f"{timestamp()} [*] Session created and initial cookies fetched.\n"
+              f"{timestamp()} [*] Session cookies: {bold_text}{session.cookies.get_dict()}{reset_text}\n"
+              f"{timestamp()} [*] Session headers correct: {bold_text}{headers_correct}{reset_text}")
     except requests.RequestException as e:
         print(f"{timestamp()} {red_bold}[!] Connection error: {e}{reset_text}")
         return None
@@ -80,6 +81,7 @@ def fetch_login_form(session: requests.Session) -> Tuple[str, Dict[str, str]]:
         Tuple[str, Dict[str, str]]: (post_url, form_values)
     """
     resp = session.get(LOGIN_PAGE_URL, timeout=10)
+    #print(f"{timestamp()} [DEBUG] fetch_login_form() resp: {resp}")
     soup = BeautifulSoup(resp.text, "html.parser")
     form = soup.find("form")
     post_url = (
@@ -87,6 +89,7 @@ def fetch_login_form(session: requests.Session) -> Tuple[str, Dict[str, str]]:
         if form and form.get("action")
         else LOGIN_POST_URL
     )
+    #print(f"{timestamp()} [DEBUG] fetch_login_form() post_url: {post_url}")
     form_values = (
         {
             inp.get("name"): inp.get("value", "")
@@ -96,6 +99,7 @@ def fetch_login_form(session: requests.Session) -> Tuple[str, Dict[str, str]]:
         if form
         else {}
     )
+    #print(f"{timestamp()} [DEBUG] fetch_login_form() form_values: {form_values}")
     return post_url, form_values
 
 
